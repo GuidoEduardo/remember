@@ -1,0 +1,8 @@
+dist/
+*.yml
+*.yaml
+*.md
+*.json
+*.scss
+*.css
+*.svg

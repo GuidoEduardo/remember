@@ -1,11 +1,11 @@
-import { createServer } from "https";
-import { graphqlServer } from "./config/graphql";
+import { createServer } from "http";
+import { yogaServer } from  "./config/yoga";
 
 async function main() {
-    const server = createServer(graphqlServer);
+    const server = createServer(yogaServer);
 
     server.listen(5000, () => {
-        console.info('server is running on https://localhost:5000 💫')
+        console.info(`🚀 server ready at: http://localhost:5000\n💫 launched`);
     });
 }
 

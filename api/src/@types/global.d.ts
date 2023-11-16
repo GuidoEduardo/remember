@@ -1,1 +1,1 @@
-type UUID = string;
+type UUID = string | { id: string };

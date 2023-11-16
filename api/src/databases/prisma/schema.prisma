@@ -7,7 +7,7 @@ generator client {
     provider = "prisma-client-js"
 }
 
-model Member {
+model User {
     id         BigInt @id @default(autoincrement())
     externalId String @db.Uuid @unique
     username   String @db.VarChar(32) @unique
@@ -24,7 +24,7 @@ model Member {
 model Deck {
     id          BigInt   @id @default(autoincrement())
     externalId  String   @db.Uuid @unique
-    owner       Member   @relation(fields: [ownerId], references: [id])
+    owner       User     @relation(fields: [ownerId], references: [id])
     ownerId     BigInt
     title       String
     cards       CardContext[]
@@ -35,7 +35,7 @@ model Deck {
 model Card {
     id              BigInt    @id @default(autoincrement())
     externalId      String    @db.Uuid @unique
-    owner           Member    @relation(fields: [ownerId], references: [id])
+    owner           User      @relation(fields: [ownerId], references: [id])
     ownerId         BigInt
     contentFront    String
     contentBack     String
@@ -51,7 +51,7 @@ model CardContext {
     deckId        BigInt
     card          Card     @relation(fields: [cardId], references: [id])
     cardId        BigInt
-    answeredBy    Member   @relation(fields: [answeredById], references: [id])
+    answeredBy    User     @relation(fields: [answeredById], references: [id])
     answeredById  BigInt
     difficulty    String
     answeredAt    DateTime

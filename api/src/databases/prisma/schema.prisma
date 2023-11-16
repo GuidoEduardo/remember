@@ -9,50 +9,53 @@ generator client {
 
 model Member {
     id         BigInt @id @default(autoincrement())
-    externalId String @db.Uuid
+    externalId String @db.Uuid @unique
     username   String @db.VarChar(32) @unique
-    email      String @db.Text @unique
+    email      String @unique
     firstName  String @db.VarChar(32)
-    lastName   String @db.Text
-    chapters   Chapter[]
-    pages      Page[]
-    createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    lastName   String
+    decks      Deck[]
+    cards      Card[]
+    answers    CardContext[]
+    createdAt  DateTime @default(now())
+    updatedAt  DateTime @updatedAt
 }
 
-model Chapter {
+model Deck {
     id          BigInt   @id @default(autoincrement())
-    externalId  String   @db.Uuid
-    author      Member   @relation(fields: [authorId], references: [id])
-    authorId    BigInt   @db.BigInt
+    externalId  String   @db.Uuid @unique
+    owner       Member   @relation(fields: [ownerId], references: [id])
+    ownerId     BigInt
     title       String
-    pages       Page[]
+    cards       CardContext[]
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 }
 
-model Page {
+model Card {
     id              BigInt    @id @default(autoincrement())
-    externalId      String    @db.Uuid
-    author          Member    @relation(fields: [authorId], references: [id])
-    authorId        BigInt    @db.BigInt
-    chapter         Chapter   @relation(fields: [chapterId], references: [id])
-    chapterId       BigInt    @db.BigInt
-    contentFront    String    @db.Text
-    contentBack     String    @db.Text
-    learnRate       LearnRate?
-    createdAt       DateTime  @db.Date @default(now())
-    updatedAt       DateTime  @db.Date @updatedAt
+    externalId      String    @db.Uuid @unique
+    owner           Member    @relation(fields: [ownerId], references: [id])
+    ownerId         BigInt
+    contentFront    String
+    contentBack     String
+    contexts        CardContext[]
+    createdAt       DateTime  @default(now())
+    updatedAt       DateTime  @updatedAt
 }
 
-model LearnRate {
+model CardContext {
     id            BigInt   @id @default(autoincrement())
-    externalId    String   @db.Uuid
-    page          Page     @relation(fields: [pageId], references: [id])
-    pageId        BigInt   @db.BigInt @unique
-    level         String
-    answeredAt    DateTime @db.Date
-    answerAgainAt DateTime @db.Date
-    createdAt     DateTime @db.Date @default(now())
-    updatedAt     DateTime @db.Date @updatedAt
+    externalId    String   @db.Uuid @unique
+    deck          Deck     @relation(fields: [deckId], references: [id])
+    deckId        BigInt
+    card          Card     @relation(fields: [cardId], references: [id])
+    cardId        BigInt
+    answeredBy    Member   @relation(fields: [answeredById], references: [id])
+    answeredById  BigInt
+    difficulty    String
+    answeredAt    DateTime
+    answerAgainAt DateTime
+    createdAt     DateTime @default(now())
+    updatedAt     DateTime @updatedAt
 }

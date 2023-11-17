@@ -1,5 +1,5 @@
 import { DocumentNode } from 'graphql';
-import { main } from './main';
-import { user } from './userSchema';
+import { baseSchema } from './baseSchema';
+import { userSchema } from './userSchema';
 
-export const UserServiceTypeDefs: DocumentNode[] = [main, user];
+export const UserServiceTypeDefs: DocumentNode[] = [baseSchema, userSchema];

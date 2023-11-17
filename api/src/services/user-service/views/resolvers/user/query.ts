@@ -1,10 +1,10 @@
-import { ErrorData } from "../../../../common/errorData";
-import { Searcher } from "../../../../common/searcher";
-import { UserDataOrError, UsersDataOrError } from "../../../@types/graphql";
-import { UserData, UserFilter } from "../../../@types/user.schema";
-import { UserController } from "../../../controllers/userController";
+import { ErrorEvent } from '../../../../common/@types/error';
+import { Searcher } from '../../../../common/searcher';
+import { UserOrError, UsersOrError } from '../../../@types/graphql';
+import { User, UserFilter } from '../../../@types/user';
+import { UserController } from '../../../controllers/userController';
 
-export class UserQuery implements Searcher<UserData, ErrorData> {
+export class UserQuery implements Searcher<User, ErrorEvent> {
 	private controller: UserController;
 
 	setController(controller: UserController): void {
@@ -15,19 +15,19 @@ export class UserQuery implements Searcher<UserData, ErrorData> {
 		this.setController(controller);
 	}
 
-	async getUser(request: { id: UUID }): Promise<UserDataOrError> {
+	async getUser(request: { id: UUID }): Promise<UserOrError> {
 		const result = await this.controller.get(request.id);
 
 		return result;
 	}
 
-	async getUsers(): Promise<UsersDataOrError> {
+	async getUsers(): Promise<UsersOrError> {
 		const results = await this.controller.getAll();
 
 		return results;
 	}
 
-	async findUser(request: { by: UserFilter }) {
+	async findUser(request: { by: UserFilter }): Promise<UsersOrError> {
 		const results = await this.controller.find(request.by);
 
 		return results;

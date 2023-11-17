@@ -15,8 +15,8 @@
 		"allowSyntheticDefaultImports": true,
 		"forceConsistentCasingInFileNames": true,
 		"strictPropertyInitialization": false,
+		"experimentalDecorators": true,
 		"allowJs": true,
-		"typeRoots": ["./src", "./node_modules/@types"],
 		"outDir": "dist"
 	},
 	"include": ["src"],

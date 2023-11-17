@@ -1,4 +1,4 @@
-import { Repository } from '../../common/repository';
-import { UserData } from '../@types/user.schema';
+import { MutableRepository } from '../../common/repository';
+import { User } from '../@types/user';
 
-export interface UserRepository extends Repository<UserData> {}
+export interface UserRepository extends MutableRepository<User> {}

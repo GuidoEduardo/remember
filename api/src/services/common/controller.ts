@@ -1,19 +1,17 @@
-import { Repository } from "./repository";
+import { MutableRepository, Repository } from './repository';
 
 export interface Controller<T, E> {
-	SetRepository(repository: Repository<T>): void;
+	create(data: object): Promise<object | E>;
 
-	create(object: object): Promise<T | E>;
+	get(externalId: UUID): Promise<object | E>;
 
-	get(externalId: UUID): Promise<T | E>;
+	getAll(): Promise<object | E>;
 
-	getAll(): Promise<T[] | E>;
+	find(filter: object): Promise<object | E>;
+}
 
-	find(object: object): Promise<T[] | E>;
-
-	update(externalId: UUID, object: object): Promise<T | E>;
+export interface MutableController<T, E> extends Controller<T, E> {
+	update(externalId: UUID, data: object): Promise<object | E>;
 
 	delete(externalId: UUID): Promise<string | E>;
-
-	handleError(err: any): E;
 }

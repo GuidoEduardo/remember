@@ -16,7 +16,7 @@ model User {
     lastName   String
     decks      Deck[]
     cards      Card[]
-    answers    CardContext[]
+    answers    Answer[]
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
 }
@@ -27,7 +27,7 @@ model Deck {
     owner       User     @relation(fields: [ownerId], references: [id])
     ownerId     BigInt
     title       String
-    cards       CardContext[]
+    cards       CardsOnDecks[]
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 }
@@ -39,23 +39,28 @@ model Card {
     ownerId         BigInt
     contentFront    String
     contentBack     String
-    contexts        CardContext[]
+    decks           CardsOnDecks[]
     createdAt       DateTime  @default(now())
     updatedAt       DateTime  @updatedAt
 }
 
-model CardContext {
+model CardsOnDecks {
     id            BigInt   @id @default(autoincrement())
-    externalId    String   @db.Uuid @unique
     deck          Deck     @relation(fields: [deckId], references: [id])
     deckId        BigInt
     card          Card     @relation(fields: [cardId], references: [id])
     cardId        BigInt
-    answeredBy    User     @relation(fields: [answeredById], references: [id])
+    answers       Answer[]
+    assignedAt    DateTime @default(now())
+}
+
+model Answer {
+    id            BigInt       @id @default(autoincrement())
+    cardOnDeck    CardsOnDecks @relation(fields: [cardOnDeckId], references: [id])
+    cardOnDeckId  BigInt
+    answeredBy    User         @relation(fields: [answeredById], references: [id])
     answeredById  BigInt
     difficulty    String
-    answeredAt    DateTime
+    answeredAt    DateTime     @default(now())
     answerAgainAt DateTime
-    createdAt     DateTime @default(now())
-    updatedAt     DateTime @updatedAt
 }

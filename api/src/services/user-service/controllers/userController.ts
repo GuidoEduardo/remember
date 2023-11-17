@@ -1,143 +1,79 @@
-import { randomUUID } from "crypto";
-import { Controller } from "../../common/controller";
-import { UserCreate, UserData, UserFilter } from "../@types/user.schema";
-import { UserRepository } from "../repositories/userRepository";
-import { UserSchema, UserSchemas } from "../schemas/user.schema";
-import { InvalidFieldError, NotFoundError, UniqueFieldError, UnknownError } from "../../common/exceptions";
-import { ErrorData, ErrorSchema } from "../../common/errorData";
-import { ZodError } from "zod";
-import { UserDataOrError, UsersDataOrError } from "../@types/graphql";
+import { randomUUID } from 'crypto';
+import { UserCreate, UserFilter } from '../@types/user';
+import { UserRepository } from '../repositories/userRepository';
+import { User as UserType, Users as UsersType } from '../@types/user';
+import { User, Users } from '../entities/user';
+import { UserOrError, UsersOrError } from '../@types/graphql';
+import { ErrorEvent as ErrorEventType } from '../../common/@types/error';
+import { MutableControllerImpl } from '../../common/controllers/mutableController';
 
+export class UserController extends MutableControllerImpl<UserType> {
+	repository: UserRepository;
 
-export class UserController implements Controller<UserData, ErrorData> {
-	private repository: UserRepository;
-
-	SetRepository(repository: UserRepository): void {
+	constructor(repository: UserRepository) {
+		super();
 		this.repository = repository;
 	}
 
-	constructor(repository: UserRepository) {
-		this.SetRepository(repository);
+	@UserController.handleError
+	async create(userRequest: UserCreate): Promise<UserOrError> {
+		const requestedUser = await User.parseAsync({
+			externalId: randomUUID(),
+			...userRequest,
+		});
+
+		const user = await User.parseAsync(await this.repository.create(requestedUser));
+
+		return {
+			__typename: 'User',
+			...user,
+		};
 	}
 
-	async create(userRequest: UserCreate): Promise<UserDataOrError> {
-		try {
-			const requestedUserData = await UserSchema.parseAsync({
-				externalId: randomUUID(),
-				...userRequest
-			});
+	@UserController.handleError
+	async get(externalId: UUID): Promise<UserOrError> {
+		const user = await User.parseAsync(await this.repository.get(externalId));
 
-			const createdUser = await this.repository.create(requestedUserData);
-
-			const userData = await UserSchema.parseAsync(createdUser);
-
-			return {
-				__typename: 'User',
-				...userData
-			}
-
-		} catch(err) {
-			return this.handleError(err);
-		}
+		return {
+			__typename: 'User',
+			...user,
+		};
 	}
 
-	async get(externalId: UUID): Promise<UserDataOrError> {
-		try {
-			const userData = await UserSchema.parseAsync(await this.repository.get(externalId));
+	@UserController.handleError
+	async getAll(): Promise<UsersOrError> {
+		const users = await Users.parseAsync(await this.repository.getAll());
 
-			return {
-				__typename: 'User',
-				...userData
-			}
-
-		} catch (err) {
-			return this.handleError(err);
-		}
+		return {
+			__typename: 'Users',
+			objects: users,
+		};
 	}
 
-	async getAll(): Promise<UsersDataOrError> {
-		try {
-			const usersData = await UserSchemas.parseAsync(await this.repository.getAll());
+	@UserController.handleError
+	async find(filter: UserFilter): Promise<UsersOrError> {
+		const users = await Users.parseAsync(await this.repository.find(filter));
 
-			return {
-				__typename: 'Users',
-				users: usersData
-			}
-		} catch (err) {
-			return this.handleError(err);
-		}
+		return {
+			__typename: 'Users',
+			objects: users,
+		};
 	}
 
-	async find(filter: UserFilter): Promise<UsersDataOrError> {
-		try {
-			const usersData = await UserSchemas.parseAsync(await this.repository.find(filter))
+	@UserController.handleError
+	async update(id: UUID, data: UserFilter): Promise<UserOrError> {
+		const user = await User.parseAsync(await this.repository.update(id, data));
 
-			return {
-				__typename: 'Users',
-				users: usersData
-			}
-
-		} catch (err) {
-			return this.handleError(err);
-		}
+		return {
+			__typename: 'User',
+			...user,
+		};
 	}
 
-	async update(id: UUID, data: UserFilter): Promise<UserDataOrError> {
-		try {
-			const userData = await UserSchema.parseAsync(await this.repository.update(id, data))
+	@UserController.handleError
+	async delete(id: UUID): Promise<string | ErrorEventType> {
+		await this.repository.delete(id);
 
-			return {
-				__typename: 'User',
-				...userData
-			}
-
-		} catch (err) {
-			return this.handleError(err);
-		}
-	}
-
-	async delete(id: UUID): Promise<string | ErrorData> {
-		try {
-			await this.repository.delete(id);
-
-			return "User deleted succesfully.";
-
-		} catch (err) {
-			return this.handleError(err);
-		}
-	}
-
-	handleError(err: any): ErrorData {
-		if (err instanceof UniqueFieldError) {
-			return ErrorSchema.parse({
-				__typename: UniqueFieldError.name,
-				message: err.message,
-				payload: [{
-					path: err.getFields
-				}]
-			});
-
-		} else if (err instanceof InvalidFieldError) {
-			return ErrorSchema.parse({
-				__typename: InvalidFieldError.name,
-				message: err.message
-			})
-		} else if (err instanceof ZodError) {
-			return ErrorSchema.parse({
-				__typename: 'ValidationError',
-				message: 'Invalid field inserted',
-				payload: err.issues
-			})
-		} else if (err instanceof NotFoundError) {
-			return ErrorSchema.parse({
-				__typename: NotFoundError.name,
-				message: err.message,
-			})
-		} else {
-			return ErrorSchema.parse({
-				__typename: UnknownError.name,
-				message: `Unknown error: ${err}`
-			})
-		}
+		return 'User deleted succesfully.';
 	}
 }

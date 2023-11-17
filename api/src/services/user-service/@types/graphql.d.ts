@@ -1,6 +1,7 @@
-import { GraphQlTypename } from "../../../@types/graphql";
-import { ErrorData } from "../../common/errorData";
-import { UserData } from "./user.schema"
+import { EntityOrError, EntitiesOrError } from '../../common/@types/graphql';
+import { User, Users } from './user';
 
-type UserDataOrError = (UserData | ErrorData) & GraphQlTypename;
-type UsersDataOrError = (UsersData | ErrorData) & GraphQlTypename;
+type UserOrError = EntityOrError<User>;
+type UsersOrError = EntitiesOrError<User>;
+
+export { UserOrError, UsersOrError };

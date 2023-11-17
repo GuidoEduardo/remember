@@ -1,4 +1,5 @@
-import { common } from "./common";
-import { user } from "./user";
+import { DocumentNode } from 'graphql';
+import { main } from './main';
+import { user } from './userSchema';
 
-export const UserServiceTypeDefs = [user, common];
+export const UserServiceTypeDefs: DocumentNode[] = [main, user];

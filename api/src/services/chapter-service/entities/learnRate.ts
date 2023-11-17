@@ -1,8 +1,8 @@
-import { BaseEntity } from "../../common/baseEntity";
-import { AnswerPeriod } from "../value-objects/answerPeriod";
-import { LearnRateId } from "../value-objects/learnRateId";
-import { RateLevelPerMiliseconds } from "../value-objects/rateLevelPerMiliseconds";
-import { PageId } from "../value-objects/pageId";
+import { BaseEntity } from '../../common/baseEntity';
+import { AnswerPeriod } from '../value-objects/answerPeriod';
+import { LearnRateId } from '../value-objects/learnRateId';
+import { RateLevelPerMiliseconds } from '../value-objects/rateLevelPerMiliseconds';
+import { PageId } from '../value-objects/pageId';
 
 class LearnRate extends BaseEntity<LearnRateId> {
 	private _pageId: PageId;

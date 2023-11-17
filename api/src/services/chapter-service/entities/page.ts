@@ -1,11 +1,11 @@
-import { PageContent } from "../value-objects/pageContent";
-import { PageId } from "../value-objects/pageId";
-import { LearnRate } from "./learnRate";
-import { LearnRateId } from "../value-objects/learnRateId";
-import { AuthorId } from "../value-objects/authorId";
-import { BaseEntity } from "../../common/baseEntity";
-import { randomUUID } from "crypto";
-import { ChapterId } from "../value-objects/chapterId";
+import { PageContent } from '../value-objects/pageContent';
+import { PageId } from '../value-objects/pageId';
+import { LearnRate } from './learnRate';
+import { LearnRateId } from '../value-objects/learnRateId';
+import { AuthorId } from '../value-objects/authorId';
+import { BaseEntity } from '../../common/baseEntity';
+import { randomUUID } from 'crypto';
+import { ChapterId } from '../value-objects/chapterId';
 
 class Page extends BaseEntity<PageId> {
 	private _authorId: AuthorId;

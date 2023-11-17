@@ -11,8 +11,8 @@ export class PageContent {
 	}
 
 	constructor() {
-		this._front = "";
-		this._back = "";
+		this._front = '';
+		this._back = '';
 	}
 
 	edit(front: string, back: string): void {

@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const learnRate = gql`
 	type LearnRate {
-		id:	ID!
+		id: ID!
 		pageId: ID!
 		level: String!
 		answeredAt: Float!

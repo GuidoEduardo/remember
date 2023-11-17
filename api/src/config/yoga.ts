@@ -1,19 +1,26 @@
-import { createYoga } from "graphql-yoga";
-import { createSchema } from "graphql-yoga";
+import { createYoga } from 'graphql-yoga';
+import { makeExecutableSchema } from '@graphql-tools/schema';
+import { userServiceResolver, UserServiceTypeDefs } from '../services/user-service/views';
+import { DocumentNode } from 'graphql';
+import { GraphQlResolver } from '../@types/graphql';
+import { DateTimeISOTypeDefinition } from 'graphql-scalars';
 
-const schema = createSchema({
-	typeDefs: `
-		type Query {
-			hello: String
-		}
-	`,
-	resolvers: {
-		Query: {
-			hello: () => "world"
-		}
-	}
+const resolvers: GraphQlResolver[] = [
+	userServiceResolver
+];
+
+const typeDefs: (DocumentNode | string)[] = [
+	...UserServiceTypeDefs,
+	DateTimeISOTypeDefinition
+];
+
+const schema = makeExecutableSchema({
+	resolvers,
+	typeDefs
 });
 
-const yogaServer = createYoga({ schema })
+const yogaServer = createYoga({
+	schema
+});
 
 export { yogaServer };

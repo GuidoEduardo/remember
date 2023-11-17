@@ -3,5 +3,5 @@ export enum RateLevelPerMiliseconds {
 	Repeat = 0,
 	Hard = 3600000,
 	Good = 86400000,
-	Easy = 432000000
+	Easy = 432000000,
 }

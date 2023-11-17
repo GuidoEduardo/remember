@@ -1,21 +1,11 @@
-import { AggregateRoot } from "../../common/aggregateRoot";
-import { UserId } from "../value-objects/userId";
-import { Name } from "../value-objects/name";
+import { AggregateRoot } from '../../common/aggregateRoot';
+import { UserId } from '../value-objects/userId';
+import { Name } from '../value-objects/name';
 
 class User extends AggregateRoot<UserId> {
 	private username: string;
 	private email: string;
 	private name: Name;
-
-	get data() {
-		return {
-			externalId: this.id.value,
-			username: this.username,
-			email: this.email,
-			firstName: this.name.first,
-			lastName: this.name.last
-		}
-	}
 
 	constructor(builder: UserBuilder) {
 		super();

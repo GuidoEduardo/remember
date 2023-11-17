@@ -1,5 +1,9 @@
 export abstract class BaseId<T> {
-	value: T;
+	private value: T;
+
+	get getValue() {
+		return this.value;
+	}
 
 	constructor(value: T) {
 		this.value = value;

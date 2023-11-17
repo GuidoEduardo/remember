@@ -1,3 +1,4 @@
+import { GraphQlResolver } from "../../../../@types/graphql";
 import { userResolver } from "./user";
 
-export const resolvers = [userResolver];
+export const UserServiceResolvers: GraphQlResolver[] = [userResolver];

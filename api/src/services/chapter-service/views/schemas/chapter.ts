@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const chapter = gql`
 	type Chapter {
-		id:	ID!
+		id: ID!
 		author: Author!
 		title: String!
 		pages: [Page]

@@ -1,3 +1,3 @@
-import { BaseId } from "../../common/valueObject";
+import { BaseId } from '../../common/valueObject';
 
 export class ChapterId extends BaseId<UUID> {}

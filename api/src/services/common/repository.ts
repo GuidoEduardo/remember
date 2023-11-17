@@ -1,12 +1,15 @@
 export interface Repository<T> {
 	create(object: T): Promise<T>;
 
-	get(id: UUID): Promise<T | null>;
+	get(externalId: UUID): Promise<T | null>;
+
+	getAll(): Promise<T[]>;
 
 	find(filter: object): Promise<T[]>;
 
-	// TODO
-	// update(filter: object, data: object): Promise<T[]>;
+	update(externalId: UUID, data: object): Promise<T>;
 
-	delete(id: UUID): Promise<boolean>;
+	delete(externalId: UUID): Promise<void>;
+
+	handleDatabaseError(err: any): void;
 }

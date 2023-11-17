@@ -1,8 +1,8 @@
-import { randomUUID } from "crypto";
-import { AggregateRoot } from "../../common/aggregateRoot";
-import { AuthorId } from "../value-objects/authorId";
-import { ChapterId } from "../value-objects/chapterId";
-import { Page } from "./page";
+import { randomUUID } from 'crypto';
+import { AggregateRoot } from '../../common/aggregateRoot';
+import { AuthorId } from '../value-objects/authorId';
+import { ChapterId } from '../value-objects/chapterId';
+import { Page } from './page';
 
 class Chapter extends AggregateRoot<ChapterId> {
 	private _authorId: AuthorId;
@@ -16,7 +16,7 @@ class Chapter extends AggregateRoot<ChapterId> {
 	}
 
 	initializePages(authorId: AuthorId) {
-		this._pages.forEach(page => {
+		this._pages.forEach((page) => {
 			page.initializePage(authorId, super.id);
 		});
 	}
@@ -61,4 +61,4 @@ class Builder {
 	}
 }
 
-export { Chapter }
+export { Chapter };

@@ -2,7 +2,7 @@ import gql from 'graphql-tag';
 
 export const author = gql`
 	type Author {
-		id:	ID!
+		id: ID!
 		username: String!
 		email: String!
 		firstName: String!

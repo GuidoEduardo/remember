@@ -1,77 +1,51 @@
-import { Prisma, PrismaClient } from '@prisma/client';
 import { UserRepository } from '../../../../services/user-service/repositories/userRepository';
-import { User, UserCreate, UserFilter, Users } from '../../../../services/user-service/@types/user';
+import { User, UserCreate, UserOptional, Users } from '../../../../services/user-service/@types/user';
 import {
 	InvalidFieldError,
-	NotFoundError,
-	UniqueFieldError,
-	UnknownError,
+	NotFoundError
 } from '../../../../services/common/exceptions';
 import { isValidUUID } from '../../../../services/common/utils/stringUtilities';
+import { MutableRepositoryImpl } from '../common/mutableRepositoryImpl';
 
-export class UserRepositoryImpl implements UserRepository {
-	private client: PrismaClient;
-
-	constructor(client: PrismaClient) {
-		this.client = client;
-	}
-
-	handleError(err: any): Error {
-		if (err instanceof Prisma.PrismaClientKnownRequestError) {
-			return new UniqueFieldError(
-				(err.meta as Record<string, string[]>).target,
-				'Unique constraint failed on the fields',
-			);
-		} else if (err instanceof Prisma.PrismaClientValidationError) {
-			return new InvalidFieldError(`Invalid fields inserted: ${err}`);
-		} else {
-			return new UnknownError(`Unknown error: ${err.message}`);
-		}
-	}
-
-	async create(user: UserCreate): Promise<User> {
-		if (!user) {
+export class UserRepositoryImpl extends MutableRepositoryImpl<User> implements UserRepository {
+	@UserRepositoryImpl.handleError
+	async create(data: UserCreate): Promise<User> {
+		if (!data) {
 			throw new InvalidFieldError('The requested creation object can not be null');
 		}
 
-		try {
-			const createdUser = await this.client.user.create({
-				data: {
-					externalId: user.externalId!,
-					...user,
-				},
-			});
+		const user = await this.client.user.create({
+			data: {
+				externalId: data.externalId!,
+				...data,
+			},
+		});
 
-			console.log('User created succesfully ', createdUser);
-
-			return createdUser;
-		} catch (err) {
-			console.log('User creation failed ', err);
-			throw this.handleError(err);
-		}
+		return user;
 	}
 
-	async get(externalId: UUID): Promise<User | null> {
-		if (!isValidUUID(externalId)) throw new NotFoundError();
+	async get(externalId: UUID): Promise<User | void> {
+		if (!isValidUUID(externalId)) throw new NotFoundError("User not found");
 
 		const user = await this.client.user.findUnique({
 			where: { externalId },
 		});
 
 		if (!user) {
-			throw new NotFoundError();
+			throw new NotFoundError("User not found");
 		}
 
 		return user;
 	}
 
+	@UserRepositoryImpl.handleError
 	async getAll(): Promise<Users> {
 		const users = await this.client.user.findMany();
 
 		return users;
 	}
 
-	async find(filter: UserFilter): Promise<Users> {
+	async find(filter: UserOptional): Promise<Users> {
 		if (!filter) return [];
 
 		const users = await this.client.user.findMany({
@@ -81,32 +55,24 @@ export class UserRepositoryImpl implements UserRepository {
 		return users || [];
 	}
 
-	async update(externalId: UUID, data: UserFilter): Promise<User> {
-		if (!isValidUUID(externalId)) throw new NotFoundError();
+	async update(externalId: UUID, data: UserOptional): Promise<User> {
+		if (!isValidUUID(externalId)) throw new NotFoundError("User not found");
 
-		try {
-			const user = await this.client.user.update({
-				where: {
-					externalId,
-				},
-				data,
-			});
+		const user = await this.client.user.update({
+			where: {
+				externalId,
+			},
+			data,
+		});
 
-			return user;
-		} catch (err) {
-			throw this.handleError(err);
-		}
+		return user;
 	}
 
 	async delete(externalId: UUID): Promise<void> {
-		if (!isValidUUID(externalId)) throw new NotFoundError();
+		if (!isValidUUID(externalId)) throw new NotFoundError("User not found");
 
-		try {
-			await this.client.user.delete({
-				where: { externalId },
-			});
-		} catch (err) {
-			this.handleError(err);
-		}
+		await this.client.user.delete({
+			where: { externalId },
+		});
 	}
 }

@@ -1,6 +1,6 @@
 class NotFoundError extends Error {
-	constructor() {
-		super('NotFoundError');
+	constructor(message: string) {
+		super(message);
 
 		Object.setPrototypeOf(this, NotFoundError.prototype);
 	}

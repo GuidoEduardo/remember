@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 const Answer = z.object({
+	id: z.string().uuid().readonly(),
 	externalId: z.string().uuid().readonly(),
 	cardOnDeckId: z.string().uuid().readonly(),
 	answeredById: z.string().uuid().readonly(),

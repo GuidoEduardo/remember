@@ -16,7 +16,6 @@ model User {
     firstName  String @db.VarChar(32)
     lastName   String
     decks      Deck[]
-    cards      Card[]
     answers    Answer[]
     createdAt  DateTime @default(now())
     updatedAt  DateTime @updatedAt
@@ -25,10 +24,10 @@ model User {
 model Deck {
     id          BigInt   @id @default(autoincrement())
     externalId  String   @db.Uuid @unique
-    owner       User     @relation(fields: [ownerId], references: [id])
+    owner       User     @relation(fields: [ownerId], references: [id], onDelete: Cascade)
     ownerId     BigInt
     title       String
-    cards       CardsOnDecks[]
+    cards       Card[]
     createdAt   DateTime @default(now())
     updatedAt   DateTime @updatedAt
 }
@@ -36,11 +35,11 @@ model Deck {
 model Card {
     id              BigInt    @id @default(autoincrement())
     externalId      String    @db.Uuid @unique
-    owner           User      @relation(fields: [ownerId], references: [id])
-    ownerId         BigInt
+    deck            Deck      @relation(fields: [deckId], references: [id], onDelete: Cascade)
+    deckId          BigInt
+    answers         Answer[]
     contentFront    String
     contentBack     String
-    decks           CardsOnDecks[]
     createdAt       DateTime  @default(now())
     updatedAt       DateTime  @updatedAt
 
@@ -48,21 +47,12 @@ model Card {
     // @@index([contentFront(ops: raw("gin_trgm_ops")), contentBack(ops: raw("gin_trgm_ops"))], type: Gin)
 }
 
-model CardsOnDecks {
-    id            BigInt   @id @default(autoincrement())
-    deck          Deck     @relation(fields: [deckId], references: [id])
-    deckId        BigInt
-    card          Card     @relation(fields: [cardId], references: [id])
-    cardId        BigInt
-    answers       Answer[]
-    assignedAt    DateTime @default(now())
-}
-
 model Answer {
     id            BigInt       @id @default(autoincrement())
-    cardOnDeck    CardsOnDecks @relation(fields: [cardOnDeckId], references: [id])
-    cardOnDeckId  BigInt
-    answeredBy    User         @relation(fields: [answeredById], references: [id])
+    externalId    String       @db.Uuid @unique
+    card          Card         @relation(fields: [cardId], references: [id], onDelete: Cascade)
+    cardId        BigInt
+    answeredBy    User         @relation(fields: [answeredById], references: [id], onDelete: Cascade)
     answeredById  BigInt
     difficulty    String
     answeredAt    DateTime     @default(now())

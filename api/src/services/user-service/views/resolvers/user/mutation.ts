@@ -1,7 +1,7 @@
 import { ErrorEvent } from '../../../../common/@types/error';
 import { Mutator } from '../../../../common/mutator';
 import { UserOrError } from '../../../@types/graphql';
-import { UserCreate, User, UserFilter } from '../../../@types/user';
+import { UserCreate, User, UserOptional } from '../../../@types/user';
 import { UserController } from '../../../controllers/userController';
 
 export class UserMutator implements Mutator<User, ErrorEvent> {
@@ -21,7 +21,7 @@ export class UserMutator implements Mutator<User, ErrorEvent> {
 		return result;
 	}
 
-	async updateUser(request: { id: UUID; data: UserFilter }): Promise<UserOrError> {
+	async updateUser(request: { id: UUID; data: UserOptional }): Promise<UserOrError> {
 		const result = await this.controller.update(request.id, request.data);
 
 		return result;

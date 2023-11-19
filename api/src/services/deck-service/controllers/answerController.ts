@@ -1,9 +1,9 @@
-import { Answer, Answers } from "../entities/answer";
-import { Answer as AnswerType } from "../@types/answer";
-import { ControllerImpl } from "../../common/controllers/controller";
-import { AnswerRepository } from "../repositories/answerRepository";
-import { AnswerOrError, AnswersOrError } from "../@types/graphql";
-import { randomUUID } from "crypto";
+import { Answer, Answers } from '../entities/answer';
+import { Answer as AnswerType } from '../@types/answer';
+import { ControllerImpl } from '../../common/controllers/controller';
+import { AnswerRepository } from '../repositories/answerRepository';
+import { AnswerOrError, AnswersOrError } from '../@types/graphql';
+import { randomUUID } from 'crypto';
 
 export class AnswerController extends ControllerImpl<AnswerType> {
 	repository: AnswerRepository;
@@ -17,15 +17,15 @@ export class AnswerController extends ControllerImpl<AnswerType> {
 	async create(data: object): Promise<AnswerOrError> {
 		const requestAnswer = Answer.parse({
 			externalId: randomUUID(),
-			...data
-		})
+			...data,
+		});
 
 		const answer = Answer.parse(await this.repository.create(requestAnswer));
 
 		return {
-			__typename: "Answer",
-			...answer
-		}
+			__typename: 'Answer',
+			...answer,
+		};
 	}
 
 	@AnswerController.handleError
@@ -33,19 +33,19 @@ export class AnswerController extends ControllerImpl<AnswerType> {
 		const answer = Answer.parse(await this.repository.get(externalId));
 
 		return {
-			__typename: "Answer",
-			...answer
-		}
+			__typename: 'Answer',
+			...answer,
+		};
 	}
 
 	@AnswerController.handleError
- 	async getAll(): Promise<AnswersOrError> {
+	async getAll(): Promise<AnswersOrError> {
 		const answers = Answers.parse(await this.repository.getAll());
 
 		return {
-			__typename: "Answers",
-			objects: answers
-		}
+			__typename: 'Answers',
+			objects: answers,
+		};
 	}
 
 	@AnswerController.handleError
@@ -53,8 +53,8 @@ export class AnswerController extends ControllerImpl<AnswerType> {
 		const answers = Answers.parse(await this.repository.find(filter));
 
 		return {
-			__typename: "Answers",
-			objects: answers
-		}
+			__typename: 'Answers',
+			objects: answers,
+		};
 	}
 }

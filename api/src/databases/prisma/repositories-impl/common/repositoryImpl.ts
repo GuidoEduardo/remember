@@ -1,8 +1,14 @@
-import { Prisma } from "@prisma/client";
-import { InvalidFieldError, UniqueFieldError, UnknownError } from "../../../../services/common/exceptions";
-import { Repository } from "../../../../services/common/repository";
+import { Prisma, PrismaClient } from '@prisma/client';
+import { InvalidFieldError, UniqueFieldError, UnknownError } from '../../../../services/common/exceptions';
+import { Repository } from '../../../../services/common/repository';
 
 export abstract class RepositoryImpl<T> implements Repository<T> {
+	protected client: PrismaClient;
+
+	contructor(client: PrismaClient) {
+		this.client = client;
+	}
+
 	abstract create(object: T): Promise<T>;
 
 	abstract get(externalId: UUID): Promise<T | void>;
@@ -14,11 +20,10 @@ export abstract class RepositoryImpl<T> implements Repository<T> {
 	static handleError(target: any, key: string, descriptor: PropertyDescriptor) {
 		const originalMethod = descriptor.value;
 
-		descriptor.value = async function(this: any, ...args: any[]) {
+		descriptor.value = async function (this: any, ...args: any[]) {
 			try {
 				return await originalMethod.apply(this, args);
-
-			} catch(err) {
+			} catch (err) {
 				if (err instanceof Prisma.PrismaClientKnownRequestError) {
 					throw new UniqueFieldError(
 						(err.meta as Record<string, string[]>).target,
@@ -30,7 +35,7 @@ export abstract class RepositoryImpl<T> implements Repository<T> {
 					throw new UnknownError(`Unknown error: ${err}`);
 				}
 			}
-		}
+		};
 
 		return descriptor;
 	}

@@ -3,14 +3,15 @@ import gql from 'graphql-tag';
 export const deckSchema = gql`
 	type Deck {
 		externalId: ID!
-		ownerId: ID!
-		title: String!
-		createdAt: DateTimeISO!
-		updatedAt: DateTimeISO!
+		ownerId:    ID
+		title:      String!
+		cards:      [Card]
+		createdAt:  DateTimeISO!
+		updatedAt:  DateTimeISO!
 	}
 
 	type Decks {
-		decks: [Deck]
+		objects: [Deck]
 	}
 
 	input DeckCreate {
@@ -19,7 +20,11 @@ export const deckSchema = gql`
 
 	input DeckFilter {
 		ownerId: ID
-		title: String
+		title: 	 String
+	}
+
+	input DeckUpdate {
+		title: 	 String
 	}
 
 	union DeckResult = Deck | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError

@@ -23,7 +23,7 @@ export const userSchema: DocumentNode = gql`
 		lastName: String!
 	}
 
-	input UserFilter {
+	input UserOptional {
 		username: String
 		email: String
 		firstName: String

@@ -1,7 +1,7 @@
 import { ErrorEvent } from '../../../../common/@types/error';
 import { Searcher } from '../../../../common/searcher';
 import { UserOrError, UsersOrError } from '../../../@types/graphql';
-import { User, UserFilter } from '../../../@types/user';
+import { User, UserOptional } from '../../../@types/user';
 import { UserController } from '../../../controllers/userController';
 
 export class UserQuery implements Searcher<User, ErrorEvent> {
@@ -27,7 +27,7 @@ export class UserQuery implements Searcher<User, ErrorEvent> {
 		return results;
 	}
 
-	async findUser(request: { by: UserFilter }): Promise<UsersOrError> {
+	async findUsers(request: { by: UserOptional }): Promise<UsersOrError> {
 		const results = await this.controller.find(request.by);
 
 		return results;

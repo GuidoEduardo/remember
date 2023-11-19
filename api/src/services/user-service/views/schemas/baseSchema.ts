@@ -5,12 +5,12 @@ export const baseSchema: DocumentNode = gql`
 	type Query {
 		getUser(id: ID!): UserResult!
 		getUsers: UserResults!
-		findUser(by: UserFilter!): UserResults!
+		findUsers(by: UserOptional!): UserResults!
 	}
 
 	type Mutation {
 		createUser(data: UserCreate!): UserResult!
-		updateUser(id: ID!, data: UserFilter): UserResult!
+		updateUser(id: ID!, data: UserOptional): UserResult!
 		deleteUser(id: ID!): String
 	}
 

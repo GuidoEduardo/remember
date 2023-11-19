@@ -1,10 +1,9 @@
 import { z } from 'zod';
 
 const Answer = z.object({
-	id: z.string().uuid().readonly(),
 	externalId: z.string().uuid().readonly(),
-	cardOnDeckId: z.string().uuid().readonly(),
-	answeredById: z.string().uuid().readonly(),
+	cardId: z.string().uuid().readonly().optional(),
+	answeredById: z.string().uuid().readonly().optional(),
 	difficulty: z.string().readonly(),
 	answeredAt: z.date().readonly(),
 	answerAgainAt: z.date().readonly(),

@@ -15,4 +15,13 @@ type AnswersOrError = EntitiesOrError<Answer>;
 type CardOnDeckOrError = EntityOrError<CardOnDeck>;
 type CardsOnDecksOrError = EntitiesOrError<CardOnDeck>;
 
-export { DeckOrError, DecksOrError, CardOrError, CardsOrError, AnswerOrError, AnswersOrError, CardOnDeckOrError, CardsOnDecksOrError };
+export {
+	DeckOrError,
+	DecksOrError,
+	CardOrError,
+	CardsOrError,
+	AnswerOrError,
+	AnswersOrError,
+	CardOnDeckOrError,
+	CardsOnDecksOrError,
+};

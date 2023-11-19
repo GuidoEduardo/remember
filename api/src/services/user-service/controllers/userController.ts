@@ -1,5 +1,5 @@
 import { randomUUID } from 'crypto';
-import { UserCreate, UserFilter } from '../@types/user';
+import { UserCreate, UserOptional } from '../@types/user';
 import { UserRepository } from '../repositories/userRepository';
 import { User as UserType, Users as UsersType } from '../@types/user';
 import { User, Users } from '../entities/user';
@@ -51,7 +51,7 @@ export class UserController extends MutableControllerImpl<UserType> {
 	}
 
 	@UserController.handleError
-	async find(filter: UserFilter): Promise<UsersOrError> {
+	async find(filter: UserOptional): Promise<UsersOrError> {
 		const users = await Users.parseAsync(await this.repository.find(filter));
 
 		return {
@@ -61,7 +61,7 @@ export class UserController extends MutableControllerImpl<UserType> {
 	}
 
 	@UserController.handleError
-	async update(id: UUID, data: UserFilter): Promise<UserOrError> {
+	async update(id: UUID, data: UserOptional): Promise<UserOrError> {
 		const user = await User.parseAsync(await this.repository.update(id, data));
 
 		return {

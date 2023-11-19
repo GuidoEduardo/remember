@@ -1,13 +1,16 @@
 import { UserRepository } from '../../../../services/user-service/repositories/userRepository';
 import { User, UserCreate, UserOptional, Users } from '../../../../services/user-service/@types/user';
-import {
-	InvalidFieldError,
-	NotFoundError
-} from '../../../../services/common/exceptions';
+import { InvalidFieldError, NotFoundError } from '../../../../services/common/exceptions';
 import { isValidUUID } from '../../../../services/common/utils/stringUtilities';
 import { MutableRepositoryImpl } from '../common/mutableRepositoryImpl';
+import { PrismaClient } from '@prisma/client';
 
 export class UserRepositoryImpl extends MutableRepositoryImpl<User> implements UserRepository {
+	constructor(client: PrismaClient) {
+		super();
+		this.client = client;
+	}
+
 	@UserRepositoryImpl.handleError
 	async create(data: UserCreate): Promise<User> {
 		if (!data) {
@@ -25,14 +28,14 @@ export class UserRepositoryImpl extends MutableRepositoryImpl<User> implements U
 	}
 
 	async get(externalId: UUID): Promise<User | void> {
-		if (!isValidUUID(externalId)) throw new NotFoundError("User not found");
+		if (!isValidUUID(externalId)) throw new NotFoundError('User not found');
 
 		const user = await this.client.user.findUnique({
 			where: { externalId },
 		});
 
 		if (!user) {
-			throw new NotFoundError("User not found");
+			throw new NotFoundError('User not found');
 		}
 
 		return user;
@@ -56,7 +59,7 @@ export class UserRepositoryImpl extends MutableRepositoryImpl<User> implements U
 	}
 
 	async update(externalId: UUID, data: UserOptional): Promise<User> {
-		if (!isValidUUID(externalId)) throw new NotFoundError("User not found");
+		if (!isValidUUID(externalId)) throw new NotFoundError('User not found');
 
 		const user = await this.client.user.update({
 			where: {
@@ -69,7 +72,7 @@ export class UserRepositoryImpl extends MutableRepositoryImpl<User> implements U
 	}
 
 	async delete(externalId: UUID): Promise<void> {
-		if (!isValidUUID(externalId)) throw new NotFoundError("User not found");
+		if (!isValidUUID(externalId)) throw new NotFoundError('User not found');
 
 		await this.client.user.delete({
 			where: { externalId },

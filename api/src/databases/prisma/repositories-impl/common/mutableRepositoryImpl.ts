@@ -1,9 +1,9 @@
-import { Prisma, PrismaClient } from "@prisma/client";
-import { InvalidFieldError, UniqueFieldError, UnknownError } from "../../../../services/common/exceptions";
-import { MutableRepository } from "../../../../services/common/repository";
+import { Prisma, PrismaClient } from '@prisma/client';
+import { InvalidFieldError, UniqueFieldError, UnknownError } from '../../../../services/common/exceptions';
+import { MutableRepository } from '../../../../services/common/repository';
 
 export abstract class MutableRepositoryImpl<T> implements MutableRepository<T> {
-	protected client: PrismaClient
+	protected client: PrismaClient;
 
 	contructor(client: PrismaClient) {
 		this.client = client;
@@ -24,11 +24,10 @@ export abstract class MutableRepositoryImpl<T> implements MutableRepository<T> {
 	static handleError(target: any, key: string, descriptor: PropertyDescriptor) {
 		const originalMethod = descriptor.value;
 
-		descriptor.value = async function(this: any, ...args: any[]) {
+		descriptor.value = async function (this: any, ...args: any[]) {
 			try {
 				return await originalMethod.apply(this, args);
-
-			} catch(err) {
+			} catch (err) {
 				if (err instanceof Prisma.PrismaClientKnownRequestError) {
 					throw new UniqueFieldError(
 						(err.meta as Record<string, string[]>).target,
@@ -40,7 +39,7 @@ export abstract class MutableRepositoryImpl<T> implements MutableRepository<T> {
 					throw new UnknownError(`Unknown error: ${err}`);
 				}
 			}
-		}
+		};
 
 		return descriptor;
 	}

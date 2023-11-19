@@ -12,11 +12,4 @@ type CardsOrError = ResultsOrError<Cards>;
 type AnswerOrError = ResultOrError<Answer>;
 type AnswersOrError = ResultsOrError<Answer>;
 
-export {
-	DeckOrError,
-	DecksOrError,
-	CardOrError,
-	CardsOrError,
-	AnswerOrError,
-	AnswersOrError,
-};
+export { DeckOrError, DecksOrError, CardOrError, CardsOrError, AnswerOrError, AnswersOrError };

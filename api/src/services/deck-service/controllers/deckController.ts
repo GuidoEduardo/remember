@@ -4,7 +4,8 @@ import { Deck as DeckType, DeckCreate, DeckOptional } from '../@types/deck';
 import { DeckOrError, DecksOrError } from '../@types/graphql';
 import { Deck, Decks } from '../entities/deck';
 import { DeckRepository } from '../repositories/deckRepository';
-import { ResultOrError } from '../../common/@types/graphql';
+import { Request, ResultOrError } from '../../common/@types/graphql';
+import { setOptions } from '../../common/utils/requestUtilities';
 
 export class DeckController extends MutableControllerImpl<DeckType> {
 	repository: DeckRepository;
@@ -30,6 +31,17 @@ export class DeckController extends MutableControllerImpl<DeckType> {
 	}
 
 	@DeckController.handleError
+	async createMany(deckRequests: DeckCreate[]): Promise<ResultOrError<number>> {
+		deckRequests = deckRequests.map((deck) => ({ ...deck, externalId: randomUUID() }));
+
+		const requestedDecks = await Decks.parseAsync(deckRequests);
+
+		const decksCount = await this.repository.createMany(requestedDecks);
+
+		return decksCount;
+	}
+
+	@DeckController.handleError
 	async get(externalId: UUID): Promise<DeckOrError> {
 		const deck = Deck.parse(await this.repository.get(externalId));
 
@@ -40,22 +52,36 @@ export class DeckController extends MutableControllerImpl<DeckType> {
 	}
 
 	@DeckController.handleError
-	async getAll(): Promise<DecksOrError> {
-		const decks = Decks.parse(await this.repository.getAll());
+	async getAll(options?: Request): Promise<DecksOrError> {
+		options = setOptions(options);
+
+		let { objects, pages } = await this.repository.getAll(options);
+
+		objects = await Decks.parseAsync(objects);
 
 		return {
 			__typename: 'Decks',
-			objects: decks,
+			offset: options.offset,
+			pages,
+			currentPage: options.currentPage,
+			objects,
 		};
 	}
 
 	@DeckController.handleError
-	async find(filter: DeckOptional): Promise<DecksOrError> {
-		const decks = Decks.parse(await this.repository.find(filter));
+	async find(filter: DeckOptional, options?: Request): Promise<DecksOrError> {
+		options = setOptions(options);
+
+		let { objects, pages } = await this.repository.find(options, filter);
+
+		objects = await Decks.parseAsync(objects);
 
 		return {
 			__typename: 'Decks',
-			objects: decks,
+			offset: options.offset,
+			pages,
+			currentPage: options.currentPage,
+			objects,
 		};
 	}
 
@@ -73,6 +99,6 @@ export class DeckController extends MutableControllerImpl<DeckType> {
 	async delete(externalId: UUID): Promise<ResultOrError<string>> {
 		await this.repository.delete(externalId);
 
-		return "Deck deleted succesfully";
+		return 'Deck deleted succesfully';
 	}
 }

@@ -1,6 +1,6 @@
-import { Controller, MutableController } from "../controller";
-import { Mutator } from "../mutator";
-import { ResultOrError } from "../@types/graphql";
+import { Controller, MutableController } from '../controller';
+import { Mutator } from '../mutator';
+import { ResultOrError } from '../@types/graphql';
 
 abstract class MutatorImpl<T> implements Mutator<T> {
 	controller: Controller<T>;
@@ -41,4 +41,4 @@ abstract class MutableMutatorImpl<T> extends MutatorImpl<T> {
 	}
 }
 
-export { MutatorImpl, MutableMutatorImpl }
+export { MutatorImpl, MutableMutatorImpl };

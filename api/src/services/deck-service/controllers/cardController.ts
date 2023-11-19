@@ -1,10 +1,11 @@
 import { randomUUID } from 'crypto';
-import { ErrorEvent } from '../../common/@types/error';
 import { MutableControllerImpl } from '../../common/controllers/mutableControllerImpl';
 import { CardCreate, CardOptional, Card as CardType } from '../@types/card';
 import { CardOrError, CardsOrError } from '../@types/graphql';
 import { CardRepository } from '../repositories/cardRepository';
 import { Card, Cards } from '../entities/card';
+import { Request, ResultOrError } from '../../common/@types/graphql';
+import { setOptions } from '../../common/utils/requestUtilities';
 
 export class CardController extends MutableControllerImpl<CardType> {
 	repository: CardRepository;
@@ -30,6 +31,17 @@ export class CardController extends MutableControllerImpl<CardType> {
 	}
 
 	@CardController.handleError
+	async createMany(cardRequests: CardCreate[]): Promise<ResultOrError<number>> {
+		cardRequests = cardRequests.map((card) => ({ ...card, externalId: randomUUID() }));
+
+		const requestedCards = await Cards.parseAsync(cardRequests);
+
+		const cardsCount = await this.repository.createMany(requestedCards);
+
+		return cardsCount;
+	}
+
+	@CardController.handleError
 	async get(externalId: UUID): Promise<CardOrError> {
 		const card = Card.parse(await this.repository.get(externalId));
 
@@ -40,22 +52,36 @@ export class CardController extends MutableControllerImpl<CardType> {
 	}
 
 	@CardController.handleError
-	async getAll(): Promise<CardsOrError> {
-		const cards = Cards.parse(await this.repository.getAll());
+	async getAll(options?: Request): Promise<CardsOrError> {
+		options = setOptions(options);
+
+		let { objects, pages } = await this.repository.getAll(options);
+
+		objects = await Cards.parseAsync(objects);
 
 		return {
 			__typename: 'Cards',
-			objects: cards,
+			offset: options.offset,
+			pages,
+			currentPage: options.currentPage,
+			objects,
 		};
 	}
 
 	@CardController.handleError
-	async find(filter: CardOptional): Promise<CardsOrError> {
-		const cards = Cards.parse(await this.repository.find(filter));
+	async find(filter: CardOptional, options?: Request): Promise<CardsOrError> {
+		options = setOptions(options);
+
+		let { objects, pages } = await this.repository.find(options, filter);
+
+		objects = await Cards.parseAsync(objects);
 
 		return {
 			__typename: 'Cards',
-			objects: cards,
+			offset: options.offset,
+			pages,
+			currentPage: options.currentPage,
+			objects,
 		};
 	}
 
@@ -70,7 +96,7 @@ export class CardController extends MutableControllerImpl<CardType> {
 	}
 
 	@CardController.handleError
-	async delete(externalId: UUID): Promise<string | ErrorEvent> {
+	async delete(externalId: UUID): Promise<ResultOrError<string>> {
 		await this.repository.delete(externalId);
 
 		return 'Card deleted successfully.';

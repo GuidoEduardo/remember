@@ -4,6 +4,8 @@ import { isValidUUID } from '../../../../services/common/utils/stringUtilities';
 import { Deck, DeckOptional, Decks } from '../../../../services/deck-service/@types/deck';
 import { DeckRepository } from '../../../../services/deck-service/repositories/deckRepository';
 import { MutableRepositoryImpl } from '../common/mutableRepositoryImpl';
+import { Request } from '../../../../services/common/@types/graphql';
+import { GenericResults } from '../../../../services/common/@types/repository';
 
 export class DeckRepositoryImpl extends MutableRepositoryImpl<Deck> implements DeckRepository {
 	constructor(client: PrismaClient) {
@@ -43,6 +45,33 @@ export class DeckRepositoryImpl extends MutableRepositoryImpl<Deck> implements D
 	}
 
 	@DeckRepositoryImpl.handleError
+	async createMany(data: Decks): Promise<number> {
+		if (!data) {
+			throw new InvalidFieldError('The requested creation object can not be null');
+		}
+
+		const queries = data.map(
+			(deck) =>
+				this.client.$executeRaw`INSERT INTO "Deck" (
+				"externalId",
+				"title",
+				"ownerId"
+			)
+			VALUES (
+				${deck.externalId}::UUID,
+				${deck.title},
+				(
+					SELECT id
+					FROM "User"
+					WHERE "User"."externalId" = ${deck.ownerId}::UUID
+				)
+			)`,
+		);
+
+		return await this.batch(queries);
+	}
+
+	@DeckRepositoryImpl.handleError
 	async get(externalId: UUID): Promise<Deck | void> {
 		if (!isValidUUID(externalId)) throw new NotFoundError('Deck not found');
 
@@ -78,44 +107,69 @@ export class DeckRepositoryImpl extends MutableRepositoryImpl<Deck> implements D
 	}
 
 	@DeckRepositoryImpl.handleError
-	async getAll(): Promise<Decks> {
-		const decks = await this.client.deck.findMany({
-			include: {
-				owner: {
-					select: {
-						externalId: true,
+	async getAll(options: Request): Promise<GenericResults<Deck>> {
+		const [pages, decks] = await this.client.$transaction([
+			this.client.deck.count(),
+			this.client.deck.findMany({
+				skip: options.currentPage * options.offset,
+				take: options.offset,
+				orderBy: {
+					createdAt: 'desc',
+				},
+				include: {
+					owner: true,
+					_count: {
+						select: {
+							cards: true,
+						},
 					},
 				},
-				_count: {
-					select: {
-						cards: true,
-					},
-				},
-			},
-		});
+			}),
+		]);
 
-		return decks.map((deck) => ({ ...deck, ownerId: deck.owner.externalId }));
+		return {
+			objects: decks.map((deck) => ({ ...deck, ownerId: deck.owner.externalId })),
+			pages: Math.floor(pages / options.offset)
+		}
 	}
 
 	@DeckRepositoryImpl.handleError
-	async find(filter: DeckOptional): Promise<Decks> {
-		if (!filter) return [];
+	async find(options: Request, filter: DeckOptional): Promise<GenericResults<Deck>> {
+		if (!filter) return { objects: [], pages: 0 };
 
-		const decks = await this.client.deck.findMany({
-			where: {
-				title: filter.title,
+		const filterFormatted = {
+			owner: {
+				externalId: filter.ownerId,
 			},
-			include: {
-				owner: true,
-				_count: {
-					select: {
-						cards: true,
+			title: filter.title
+		};
+
+		const [pages, decks] = await this.client.$transaction([
+			this.client.deck.count({
+				where: filterFormatted,
+			}),
+			this.client.deck.findMany({
+				skip: options.currentPage * options.offset,
+				take: options.offset,
+				where: filterFormatted,
+				orderBy: {
+					createdAt: 'desc',
+				},
+				include: {
+					owner: true,
+					_count: {
+						select: {
+							cards: true,
+						},
 					},
 				},
-			},
-		});
+			}),
+		]);
 
-		return decks.map((deck) => ({ ...deck, ownerId: deck.owner.externalId }));
+		return {
+			objects: decks.map((deck) => ({ ...deck, ownerId: deck.owner.externalId })),
+			pages: Math.floor(pages / options.offset)
+		}
 	}
 
 	@DeckRepositoryImpl.handleError

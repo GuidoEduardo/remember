@@ -1,0 +1,3 @@
+-- AlterTable
+ALTER TABLE "User" ALTER COLUMN "username" SET DATA TYPE TEXT,
+ALTER COLUMN "firstName" SET DATA TYPE TEXT;

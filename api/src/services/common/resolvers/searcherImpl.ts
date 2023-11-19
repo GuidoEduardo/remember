@@ -1,6 +1,6 @@
-import { ResultOrError, ResultsOrError } from "../@types/graphql";
-import { Controller } from "../controller";
-import { Searcher } from "../searcher";
+import { Request, ResultOrError, ResultsOrError } from '../@types/graphql';
+import { Controller } from '../controller';
+import { Searcher } from '../searcher';
 
 export abstract class SearcherImpl<T> implements Searcher<T> {
 	controller: Controller<T>;
@@ -15,14 +15,14 @@ export abstract class SearcherImpl<T> implements Searcher<T> {
 		return result;
 	}
 
-	async getAll(): Promise<ResultsOrError<T>> {
-		const results = await this.controller.getAll();
+	async getAll(request: { options?: Request }): Promise<ResultsOrError<T>> {
+		const results = await this.controller.getAll(request.options);
 
 		return results;
 	}
 
-	async find(request: { by: MakeOptional<T> }): Promise<ResultsOrError<T>> {
-		const results = await this.controller.find(request.by);
+	async find(request: { options?: Request; by: MakeOptional<T> }): Promise<ResultsOrError<T>> {
+		const results = await this.controller.find(request.by, request.options);
 
 		return results;
 	}

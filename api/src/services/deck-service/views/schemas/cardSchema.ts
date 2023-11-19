@@ -2,44 +2,47 @@ import gql from 'graphql-tag';
 
 export const cardSchema = gql`
 	type Card {
-		externalId:   ID!
-		deckId: 	  ID
+		externalId: ID!
+		deckId: ID
 		contentFront: String!
-		contentBack:  String!
-		answers: 	  [Answer]
-		createdAt: 	  DateTimeISO!
-		updatedAt: 	  DateTimeISO!
+		contentBack: String!
+		answers: [Answer]
+		createdAt: DateTimeISO!
+		updatedAt: DateTimeISO!
 	}
 
-	type Cards {
+	type Cards implements Responses {
+		offset: Int!
+		pages: Int!
+		currentPage: Int!
 		objects: [Card]
 	}
 
 	type CardWithoutAnswers {
-		externalId:   ID!
+		externalId: ID!
 		contentFront: String!
-		contentBack:  String!
-		createdAt: 	  DateTimeISO!
-		updatedAt: 	  DateTimeISO!
+		contentBack: String!
+		createdAt: DateTimeISO!
+		updatedAt: DateTimeISO!
 	}
 
 	input CardCreate {
-		deckId:		  ID!
+		deckId: ID!
 		contentFront: String!
-		contentBack:  String!
+		contentBack: String!
 	}
 
-	input CardFilter {
-		deckId: 	  ID
+	input CardOptional {
+		deckId: ID
 		contentFront: String
-		contentBack:  String
+		contentBack: String
 	}
 
 	input CardUpdate {
 		contentFront: String
-		contentBack:  String
+		contentBack: String
 	}
 
-	union CardResult = Card | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
-	union CardResults = Cards | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
+	union CardResponse = Card | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
+	union CardResponses = Cards | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
 `;

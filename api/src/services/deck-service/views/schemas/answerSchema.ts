@@ -2,31 +2,40 @@ import gql from 'graphql-tag';
 
 export const answerSchema = gql`
 	type Answer {
-		externalId:    ID!
-		cardId: 	   ID
-		answeredById:  ID
-		difficulty:    String!
-		answeredAt:    DateTimeISO!
+		externalId: ID!
+		cardId: ID
+		answeredById: ID
+		difficulty: String!
+		answeredAt: DateTimeISO!
 		answerAgainAt: DateTimeISO!
 	}
 
-	type Answers {
+	type Answers implements Responses {
+		offset: Int!
+		pages: Int!
+		currentPage: Int!
 		objects: [Answer]
 	}
 
 	input AnswerCreate {
-		cardId: 	   ID!
-		answeredById:  ID!
-		difficulty:    String!
+		cardId: ID!
+		answeredById: ID!
+		difficulty: String!
 	}
 
-	input AnswerFilter {
-		cardId: 	   ID
-		answeredById:  ID
-		difficulty:    String
+	input AnswerOptional {
+		cardId: ID
+		answeredById: ID
+		difficulty: String
 	}
 
-	union AnswerResult = Answer | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
+	union AnswerResponse = Answer | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
 
-	union AnswerResults = Answers | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
+	union AnswerResponses =
+		  Answers
+		| UniqueFieldError
+		| InvalidFieldError
+		| ValidationError
+		| NotFoundError
+		| UnknownError
 `;

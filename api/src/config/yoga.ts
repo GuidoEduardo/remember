@@ -7,10 +7,7 @@ import { DocumentNode } from 'graphql';
 import { GraphQlResolver } from '../@types/graphql';
 import { DateTimeISOTypeDefinition } from 'graphql-scalars';
 
-const resolvers: GraphQlResolver[] = [
-	UserServiceResolver,
-	DeckServiceResolver
-];
+const resolvers: GraphQlResolver[] = [UserServiceResolver, DeckServiceResolver];
 
 const typeDefs: (DocumentNode | string)[] = [
 	...UserServiceTypeDefs,

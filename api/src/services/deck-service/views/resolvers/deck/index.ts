@@ -1,15 +1,16 @@
-import { DeckCreate, DeckOptional } from "../../../@types/deck";
-import { controllers } from "../../../controllers";
-import { DeckMutator } from "./mutation";
-import { DeckSearcher } from "./query";
+import { Request } from '../../../../common/@types/graphql';
+import { DeckCreate, DeckOptional } from '../../../@types/deck';
+import { controllers } from '../../../controllers';
+import { DeckMutator } from './mutation';
+import { DeckSearcher } from './query';
 
 const deckSearcher = new DeckSearcher(controllers.deckController);
 const deckMutator = new DeckMutator(controllers.deckController);
 
 const deckQueries = {
 	getDeck: (_: unknown, request: { id: UUID }) => deckSearcher.get(request),
-	getDecks: (_: unknown) => deckSearcher.getAll(),
-	findDecks: (_: unknown, request: { by: DeckOptional }) => deckSearcher.find(request),
+	getDecks: (_: unknown, request: { options?: Request }) => deckSearcher.getAll(request),
+	findDecks: (_: unknown, request: { options?: Request; by: DeckOptional }) => deckSearcher.find(request),
 };
 
 const deckMutations = {

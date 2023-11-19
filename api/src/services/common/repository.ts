@@ -1,11 +1,16 @@
+import { Request } from './@types/graphql';
+import { GenericResults } from './@types/repository';
+
 interface Repository<T> {
-	create(object: T): Promise<T>;
+	create(data: T): Promise<T>;
+
+	createMany(data: T[]): Promise<number>;
 
 	get(externalId: UUID): Promise<T | void>;
 
-	getAll(): Promise<T[]>;
+	getAll(options: Request): Promise<GenericResults<T>>;
 
-	find(filter: object): Promise<T[]>;
+	find(options: Request, filter: object): Promise<GenericResults<T>>;
 }
 
 interface MutableRepository<T> extends Repository<T> {

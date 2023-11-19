@@ -3,14 +3,17 @@ import gql from 'graphql-tag';
 export const deckSchema = gql`
 	type Deck {
 		externalId: ID!
-		ownerId:    ID
-		title:      String!
-		cards:      [CardWithoutAnswers]
-		createdAt:  DateTimeISO!
-		updatedAt:  DateTimeISO!
+		ownerId: ID
+		title: String!
+		cards: [CardWithoutAnswers]
+		createdAt: DateTimeISO!
+		updatedAt: DateTimeISO!
 	}
 
-	type Decks {
+	type Decks implements Responses {
+		offset: Int!
+		pages: Int!
+		currentPage: Int!
 		objects: [Deck]
 	}
 
@@ -19,16 +22,16 @@ export const deckSchema = gql`
 		title: String!
 	}
 
-	input DeckFilter {
+	input DeckOptional {
 		ownerId: ID
-		title: 	 String
+		title: String
 	}
 
 	input DeckUpdate {
-		title: 	 String
+		title: String
 	}
 
-	union DeckResult = Deck | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
+	union DeckResponse = Deck | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
 
-	union DeckResults = Decks | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
+	union DeckResponses = Decks | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
 `;

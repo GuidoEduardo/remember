@@ -18,7 +18,10 @@ model User {
     decks      Deck[]
     answers    Answer[]
     createdAt  DateTime @default(now())
-    updatedAt  DateTime @updatedAt
+    updatedAt  DateTime @updatedAt @default(now())
+
+    @@index([externalId])
+    @@index([username])
 }
 
 model Deck {
@@ -29,7 +32,10 @@ model Deck {
     title       String
     cards       Card[]
     createdAt   DateTime @default(now())
-    updatedAt   DateTime @updatedAt
+    updatedAt   DateTime @updatedAt @default(now())
+
+    @@index([externalId])
+    @@index([ownerId, createdAt(sort: Desc)])
 }
 
 model Card {
@@ -41,10 +47,9 @@ model Card {
     contentFront    String
     contentBack     String
     createdAt       DateTime  @default(now())
-    updatedAt       DateTime  @updatedAt
+    updatedAt       DateTime  @updatedAt @default(now())
 
-    // @@index([externalId], type: BTree)
-    // @@index([contentFront(ops: raw("gin_trgm_ops")), contentBack(ops: raw("gin_trgm_ops"))], type: Gin)
+    @@index([externalId])
 }
 
 enum DifficultyLevel {
@@ -64,4 +69,7 @@ model Answer {
     difficulty    DifficultyLevel
     answeredAt    DateTime
     answerAgainAt DateTime
+
+    @@index([externalId])
+    @@index([cardId, answeredAt(sort: Desc)])
 }

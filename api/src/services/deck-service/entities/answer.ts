@@ -4,10 +4,10 @@ enum DifficultyTimeInSeconds {
 	Retry = 0,
 	Hard = 3600000,
 	Good = 86400000,
-	Easy = 432000000
-};
+	Easy = 432000000,
+}
 
-const DifficultyLevel = z.enum(["Retry", "Hard", "Good", "Easy"]);
+const DifficultyLevel = z.enum(['Retry', 'Hard', 'Good', 'Easy']);
 
 const Answer = z.object({
 	externalId: z.string().uuid().readonly(),

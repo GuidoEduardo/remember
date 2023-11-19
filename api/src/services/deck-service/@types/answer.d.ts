@@ -6,5 +6,4 @@ type Answers = z.infer<typeof Answers>;
 type AnswerCreate = Omit<Answer, 'externalId' | 'answeredAt' | 'answerAgainAt'>;
 type AnswerOptional = MakeOptional<AnswerCreate>;
 
-
 export { Answer, Answers, AnswerOptional, AnswerCreate };

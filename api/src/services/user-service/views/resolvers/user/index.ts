@@ -1,3 +1,4 @@
+import { Request } from '../../../../common/@types/graphql';
 import { UserCreate, UserOptional } from '../../../@types/user';
 import { controllers } from '../../../controllers';
 import { UserMutator } from './mutation';
@@ -8,8 +9,8 @@ const userMutator = new UserMutator(controllers.userController);
 
 const userQueries = {
 	getUser: (_: unknown, request: { id: UUID }) => userSearcher.get(request),
-	getUsers: (_: unknown) => userSearcher.getAll(),
-	findUsers: (_: unknown, request: { by: UserOptional }) => userSearcher.find(request),
+	getUsers: (_: unknown, request: { options?: Request }) => userSearcher.getAll(request),
+	findUsers: (_: unknown, request: { options?: Request; by: UserOptional }) => userSearcher.find(request),
 };
 
 const userMutations = {

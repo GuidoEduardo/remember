@@ -1,7 +1,16 @@
 import { GraphQlTypename } from '../../../@types/graphql';
 import { ErrorEvent } from './error';
 
-type ResultOrError<T> = (T | ((T | ErrorEvent) & GraphQlTypename));
-type ResultsOrError<T> = ({ objects: T[] } | ErrorEvent) & GraphQlTypename;
+type Request = {
+	offset: number;
+	currentPage: number;
+};
 
-export { ResultOrError, ResultsOrError };
+interface Response extends Request {
+	pages: number;
+}
+
+type ResultOrError<T> = T | ((T | ErrorEvent) & GraphQlTypename);
+type ResultsOrError<T> = ({ objects: T[] } | ErrorEvent) & GraphQlTypename & Response;
+
+export { ResultOrError, ResultsOrError, Response, Request, Paginate };

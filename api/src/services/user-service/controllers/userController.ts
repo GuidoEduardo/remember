@@ -1,11 +1,12 @@
 import { randomUUID } from 'crypto';
 import { UserCreate, UserOptional } from '../@types/user';
 import { UserRepository } from '../repositories/userRepository';
-import { User as UserType, Users as UsersType } from '../@types/user';
+import { User as UserType } from '../@types/user';
 import { User, Users } from '../entities/user';
 import { UserOrError, UsersOrError } from '../@types/graphql';
-import { ErrorEvent as ErrorEventType } from '../../common/@types/error';
 import { MutableControllerImpl } from '../../common/controllers/mutableControllerImpl';
+import { Request, ResultOrError } from '../../common/@types/graphql';
+import { setOptions } from '../../common/utils/requestUtilities';
 
 export class UserController extends MutableControllerImpl<UserType> {
 	repository: UserRepository;
@@ -18,8 +19,8 @@ export class UserController extends MutableControllerImpl<UserType> {
 	@UserController.handleError
 	async create(userRequest: UserCreate): Promise<UserOrError> {
 		const requestedUser = await User.parseAsync({
-			externalId: randomUUID(),
 			...userRequest,
+			externalId: userRequest.externalId || randomUUID(),
 		});
 
 		const user = await User.parseAsync(await this.repository.create(requestedUser));
@@ -28,6 +29,17 @@ export class UserController extends MutableControllerImpl<UserType> {
 			__typename: 'User',
 			...user,
 		};
+	}
+
+	@UserController.handleError
+	async createMany(userRequests: UserCreate[]): Promise<ResultOrError<number>> {
+		userRequests = userRequests.map((user) => ({ ...user, externalId: user.externalId || randomUUID() }));
+
+		const requestedUsers = await Users.parseAsync(userRequests);
+
+		const usersCount = await this.repository.createMany(requestedUsers);
+
+		return usersCount;
 	}
 
 	@UserController.handleError
@@ -41,22 +53,36 @@ export class UserController extends MutableControllerImpl<UserType> {
 	}
 
 	@UserController.handleError
-	async getAll(): Promise<UsersOrError> {
-		const users = await Users.parseAsync(await this.repository.getAll());
+	async getAll(options?: Request): Promise<UsersOrError> {
+		options = setOptions(options);
+
+		let { objects, pages } = await this.repository.getAll(options);
+
+		objects = await Users.parseAsync(objects);
 
 		return {
 			__typename: 'Users',
-			objects: users,
+			offset: options.offset,
+			pages,
+			currentPage: options.currentPage,
+			objects,
 		};
 	}
 
 	@UserController.handleError
-	async find(filter: UserOptional): Promise<UsersOrError> {
-		const users = await Users.parseAsync(await this.repository.find(filter));
+	async find(filter: UserOptional, options?: Request): Promise<UsersOrError> {
+		options = setOptions(options);
+
+		let { objects, pages } = await this.repository.find(options, filter);
+
+		objects = await Users.parseAsync(objects);
 
 		return {
 			__typename: 'Users',
-			objects: users,
+			offset: options.offset,
+			pages,
+			currentPage: options.currentPage,
+			objects,
 		};
 	}
 
@@ -71,7 +97,7 @@ export class UserController extends MutableControllerImpl<UserType> {
 	}
 
 	@UserController.handleError
-	async delete(id: UUID): Promise<string | ErrorEventType> {
+	async delete(id: UUID): Promise<ResultOrError<string>> {
 		await this.repository.delete(id);
 
 		return 'User deleted succesfully.';

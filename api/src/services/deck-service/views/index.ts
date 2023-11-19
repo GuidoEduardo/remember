@@ -11,12 +11,12 @@ const DeckServiceResolver: GraphQlResolver = {
 	Query: {
 		...deckQueries,
 		...cardQueries,
-		...answerQueries
+		...answerQueries,
 	},
 	Mutation: {
 		...deckMutations,
 		...cardMutations,
-		...answerMutations
+		...answerMutations,
 	},
 };
 

@@ -12,7 +12,10 @@ export const userSchema: DocumentNode = gql`
 		updatedAt: DateTimeISO!
 	}
 
-	type Users {
+	type Users implements Responses {
+		offset: Int!
+		pages: Int!
+		currentPage: Int!
 		objects: [User]
 	}
 
@@ -30,7 +33,7 @@ export const userSchema: DocumentNode = gql`
 		lastName: String
 	}
 
-	union UserResult = User | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
+	union UserResponse = User | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
 
-	union UserResults = Users | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
+	union UserResponses = Users | UniqueFieldError | InvalidFieldError | ValidationError | NotFoundError | UnknownError
 `;

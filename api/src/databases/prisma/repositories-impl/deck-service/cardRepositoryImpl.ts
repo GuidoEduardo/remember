@@ -1,9 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import { PrismaClient, PrismaPromise } from '@prisma/client';
 import { InvalidFieldError, NotFoundError, UnknownError } from '../../../../services/common/exceptions';
 import { isValidUUID } from '../../../../services/common/utils/stringUtilities';
 import { Card, CardOptional, Cards } from '../../../../services/deck-service/@types/card';
 import { CardRepository } from '../../../../services/deck-service/repositories/cardRepository';
 import { MutableRepositoryImpl } from '../common/mutableRepositoryImpl';
+import { Request } from '../../../../services/common/@types/graphql';
+import { GenericResults } from '../../../../services/common/@types/repository';
 
 export class CardRepositoryImpl extends MutableRepositoryImpl<Card> implements CardRepository {
 	constructor(client: PrismaClient) {
@@ -44,6 +46,35 @@ export class CardRepositoryImpl extends MutableRepositoryImpl<Card> implements C
 			createdAt: card.createdAt,
 			updatedAt: card.updatedAt,
 		};
+	}
+
+	@CardRepositoryImpl.handleError
+	async createMany(data: Cards): Promise<number> {
+		if (!data) {
+			throw new InvalidFieldError('The requested creation object can not be null');
+		}
+
+		const queries = data.map(
+			(card) =>
+				this.client.$executeRaw`INSERT INTO "Card" (
+				"externalId",
+				"contentFront",
+				"contentBack",
+				"deckId"
+			)
+			VALUES (
+				${card.externalId}::UUID,
+				${card.contentFront},
+				${card.contentBack},
+				(
+					SELECT id
+					FROM "Deck"
+					WHERE "Deck"."externalId" = ${card.deckId}::UUID
+				)
+			)`,
+		);
+
+		return await this.batch(queries);
 	}
 
 	@CardRepositoryImpl.handleError
@@ -89,41 +120,72 @@ export class CardRepositoryImpl extends MutableRepositoryImpl<Card> implements C
 	}
 
 	@CardRepositoryImpl.handleError
-	async getAll(): Promise<Cards> {
-		const cards = await this.client.card.findMany({
-			include: {
-				deck: {
-					select: {
-						externalId: true,
+	async getAll(options: Request): Promise<GenericResults<Card>> {
+		const [pages, cards] = await this.client.$transaction([
+			this.client.card.count(),
+			this.client.card.findMany({
+				skip: options.currentPage * options.offset,
+				take: options.offset,
+				orderBy: {
+					createdAt: 'desc',
+				},
+				include: {
+					deck: {
+						select: {
+							externalId: true,
+						},
 					},
 				},
-			},
-		});
+			}),
+		]);
 
-		return cards.map((card) => ({ ...card, deckId: card.deck.externalId }));
+		return {
+			objects: cards.map((card) => ({ ...card, deckId: card.deck.externalId })),
+			pages: Math.floor(pages / options.offset),
+		};
 	}
 
 	@CardRepositoryImpl.handleError
-	async find(filter: CardOptional): Promise<Cards> {
-		const cards = await this.client.card.findMany({
-			where: {
-				contentFront: {
-					search: filter.contentFront,
-				},
-				contentBack: {
-					search: filter.contentBack,
-				},
+	async find(options: Request, filter: CardOptional): Promise<GenericResults<Card>> {
+		if (!filter) return { objects: [], pages: 0 };
+
+		const filterFormatted = {
+			deck: {
+				externalId: filter.deckId,
 			},
-			include: {
-				deck: {
-					select: {
-						externalId: true,
+			contentFront: {
+				search: filter.contentFront,
+			},
+			contentBack: {
+				search: filter.contentBack,
+			}
+		};
+
+		const [pages, cards] = await this.client.$transaction([
+			this.client.card.count({
+				where: filterFormatted,
+			}),
+			this.client.card.findMany({
+				skip: options.currentPage * options.offset,
+				take: options.offset,
+				where: filterFormatted,
+				orderBy: {
+					createdAt: 'desc',
+				},
+				include: {
+					deck: {
+						select: {
+							externalId: true,
+						},
 					},
 				},
-			},
-		});
+			}),
+		]);
 
-		return cards.map((card) => ({ ...card, deckId: card.deck.externalId }));
+		return {
+			objects: cards.map((card) => ({ ...card, deckId: card.deck.externalId })),
+			pages: Math.floor(pages / options.offset),
+		};
 	}
 
 	@CardRepositoryImpl.handleError

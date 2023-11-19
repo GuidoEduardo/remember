@@ -1,13 +1,15 @@
-import { ResultOrError, ResultsOrError } from "./@types/graphql";
+import { Request, ResultOrError, ResultsOrError } from './@types/graphql';
 
 export interface Controller<T> {
 	create(data: object): Promise<ResultOrError<T>>;
 
+	createMany(data: object): Promise<ResultOrError<number>>;
+
 	get(externalId: UUID): Promise<ResultOrError<T>>;
 
-	getAll(): Promise<ResultsOrError<T>>;
+	getAll(options?: Request): Promise<ResultsOrError<T>>;
 
-	find(filter: object): Promise<ResultsOrError<T>>;
+	find(filter: object, options?: Request): Promise<ResultsOrError<T>>;
 }
 
 export interface MutableController<T> extends Controller<T> {

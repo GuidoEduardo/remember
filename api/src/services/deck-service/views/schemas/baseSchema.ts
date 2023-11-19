@@ -2,30 +2,41 @@ import { DocumentNode } from 'graphql';
 import gql from 'graphql-tag';
 
 export const baseSchema: DocumentNode = gql`
+	input Request {
+		offset: Int
+		currentPage: Int
+	}
+
+	interface Responses {
+		offset: Int!
+		pages: Int!
+		currentPage: Int!
+	}
+
 	type Query {
-		getDeck(id: ID!): DeckResult!
-		getDecks: DeckResults!
-		findDecks(by: DeckFilter!): DeckResults!
+		getDeck(id: ID!): DeckResponse!
+		getDecks(options: Request): DeckResponses!
+		findDecks(options: Request, by: DeckOptional!): DeckResponses!
 
-		getCard(id: ID!): CardResult!
-		getCards: CardResults!
-		findCards(by: CardFilter!): CardResults!
+		getCard(id: ID!): CardResponse!
+		getCards(options: Request): CardResponses!
+		findCards(options: Request, by: CardOptional!): CardResponses!
 
-		getAnswer(id: ID!): AnswerResult!
-		getAnswers: AnswerResults!
-		findAnswers(by: AnswerFilter!): AnswerResults!
+		getAnswer(id: ID!): AnswerResponse!
+		getAnswers(options: Request): AnswerResponses!
+		findAnswers(options: Request, by: AnswerOptional!): AnswerResponses!
 	}
 
 	type Mutation {
-		createDeck(data: DeckCreate!): DeckResult!
-		updateDeck(id: ID!, data: DeckUpdate): DeckResult!
+		createDeck(data: DeckCreate!): DeckResponse!
+		updateDeck(id: ID!, data: DeckUpdate): DeckResponse!
 		deleteDeck(id: ID!): String
 
-		createCard(data: CardCreate!): CardResult!
-		updateCard(id: ID!, data: CardUpdate): CardResult!
+		createCard(data: CardCreate!): CardResponse!
+		updateCard(id: ID!, data: CardUpdate): CardResponse!
 		deleteCard(id: ID!): String
 
-		createAnswer(data: AnswerCreate!): AnswerResult!
+		createAnswer(data: AnswerCreate!): AnswerResponse!
 	}
 
 	schema {

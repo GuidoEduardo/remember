@@ -3,18 +3,20 @@ import { Controller } from '../controller';
 import { Repository } from '../repository';
 import { InvalidFieldError, NotFoundError, UniqueFieldError, UnknownError } from '../exceptions';
 import { ZodError } from 'zod';
-import { ResultOrError, ResultsOrError } from '../@types/graphql';
+import { Request, ResultOrError, ResultsOrError } from '../@types/graphql';
 
 export abstract class ControllerImpl<T> implements Controller<T> {
 	abstract repository: Repository<T>;
 
 	abstract create(data: object): Promise<ResultOrError<T>>;
 
+	abstract createMany(data: object): Promise<ResultOrError<number>>;
+
 	abstract get(externalId: UUID): Promise<ResultOrError<T>>;
 
-	abstract getAll(): Promise<ResultsOrError<T>>;
+	abstract getAll(options?: Request): Promise<ResultsOrError<T>>;
 
-	abstract find(filter: object): Promise<ResultsOrError<T>>;
+	abstract find(filter: object, options?: Request): Promise<ResultsOrError<T>>;
 
 	static handleError(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
 		const originalMethod = descriptor.value;
@@ -23,6 +25,8 @@ export abstract class ControllerImpl<T> implements Controller<T> {
 			try {
 				return await originalMethod.apply(this, args);
 			} catch (err) {
+				console.error(`${typeof err} ${err}`);
+
 				if (err instanceof UniqueFieldError) {
 					return ErrorEvent.parse({
 						__typename: UniqueFieldError.name,

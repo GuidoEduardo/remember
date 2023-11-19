@@ -1,9 +1,11 @@
-import { PrismaClient } from '@prisma/client';
+import { DifficultyLevel, PrismaClient, PrismaPromise } from '@prisma/client';
 import { InvalidFieldError, NotFoundError, UnknownError } from '../../../../services/common/exceptions';
 import { isValidUUID } from '../../../../services/common/utils/stringUtilities';
 import { Answer, AnswerOptional, Answers } from '../../../../services/deck-service/@types/answer';
 import { AnswerRepository } from '../../../../services/deck-service/repositories/answerRepository';
 import { RepositoryImpl } from '../common/repositoryImpl';
+import { Request } from '../../../../services/common/@types/graphql';
+import { GenericResults } from '../../../../services/common/@types/repository';
 
 export class AnswerRepositoryImpl extends RepositoryImpl<Answer> implements AnswerRepository {
 	constructor(client: PrismaClient) {
@@ -58,6 +60,43 @@ export class AnswerRepositoryImpl extends RepositoryImpl<Answer> implements Answ
 	}
 
 	@AnswerRepositoryImpl.handleError
+	async createMany(data: Answers): Promise<number> {
+		if (!data) {
+			throw new InvalidFieldError('The requested creation object can not be null');
+		}
+
+		const queries = data.map(
+			(answer) =>
+				this.client.$executeRaw`INSERT INTO "Answer" (
+				"externalId",
+				"cardId",
+				"answeredById",
+				"answeredAt",
+				"answerAgainAt",
+				difficulty
+			)
+			VALUES (
+				${answer.externalId}::UUID,
+				(
+					SELECT id
+					FROM "Card"
+					WHERE "Card"."externalId" = ${answer.cardId}::UUID
+				),
+				(
+					SELECT id
+					FROM "User"
+					WHERE "User"."externalId" = ${answer.answeredById}::UUID
+				),
+				${answer.answeredAt},
+				${answer.answerAgainAt},
+				${answer.difficulty}::"DifficultyLevel"
+			)`,
+		);
+
+		return await this.batch(queries);
+	}
+
+	@AnswerRepositoryImpl.handleError
 	async get(externalId: UUID): Promise<Answer> {
 		if (!isValidUUID(externalId)) throw new NotFoundError('Answer not found');
 
@@ -89,52 +128,87 @@ export class AnswerRepositoryImpl extends RepositoryImpl<Answer> implements Answ
 	}
 
 	@AnswerRepositoryImpl.handleError
-	async getAll(): Promise<Answers> {
-		const answers = await this.client.answer.findMany({
-			include: {
-				answeredBy: {
-					select: {
-						externalId: true,
+	async getAll(options: Request): Promise<GenericResults<Answer>> {
+		const [pages, answers] = await this.client.$transaction([
+			this.client.answer.count(),
+			this.client.answer.findMany({
+				skip: options.currentPage * options.offset,
+				take: options.offset,
+				orderBy: {
+					answeredAt: 'desc',
+				},
+				include: {
+					answeredBy: {
+						select: {
+							externalId: true,
+						},
+					},
+					card: {
+						select: {
+							externalId: true,
+						},
 					},
 				},
-				card: {
-					select: {
-						externalId: true,
-					},
-				},
-			},
-		});
+			}),
+		]);
 
-		return answers.map((answer) => ({
-			...answer,
-			answeredById: answer.answeredBy.externalId,
-			cardId: answer.card.externalId,
-		}));
+		return {
+			objects: answers.map((answer) => ({
+				...answer,
+				answeredById: answer.answeredBy.externalId,
+				cardId: answer.card.externalId,
+			})),
+			pages: Math.floor(pages / options.offset),
+		};
 	}
 
 	@AnswerRepositoryImpl.handleError
-	async find(filter: AnswerOptional): Promise<Answers> {
-		if (!filter) return [];
+	async find(options: Request, filter: AnswerOptional): Promise<GenericResults<Answer>> {
+		if (!filter) return { objects: [], pages: 0 };
 
-		const answers = await this.client.answer.findMany({
-			include: {
-				answeredBy: {
-					select: {
-						externalId: true,
-					},
-				},
-				card: {
-					select: {
-						externalId: true,
-					},
-				},
+		const filterFormatted = {
+			card: {
+				externalId: filter.cardId,
 			},
-		});
+			answeredBy: {
+				externalId: filter.answeredById,
+			},
+			difficulty: filter.difficulty,
+		};
 
-		return answers.map((answer) => ({
-			...answer,
-			answeredById: answer.answeredBy.externalId,
-			cardId: answer.card.externalId,
-		}));
+		const [pages, answers] = await this.client.$transaction([
+			this.client.answer.count({
+				where: filterFormatted,
+			}),
+			this.client.answer.findMany({
+				skip: options.currentPage * options.offset,
+				take: options.offset,
+				where: filterFormatted,
+				orderBy: {
+					answeredAt: 'desc',
+				},
+				include: {
+					answeredBy: {
+						select: {
+							externalId: true,
+						},
+					},
+					card: {
+						select: {
+							externalId: true,
+						},
+					},
+				},
+			}),
+		]);
+
+		return {
+			objects: answers.map((answer) => ({
+				...answer,
+				answeredById: answer.answeredBy.externalId,
+				cardId: answer.card.externalId,
+			})),
+			pages: Math.floor(pages / options.offset),
+		};
 	}
 }

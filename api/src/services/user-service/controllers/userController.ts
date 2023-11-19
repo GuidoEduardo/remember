@@ -5,7 +5,7 @@ import { User as UserType, Users as UsersType } from '../@types/user';
 import { User, Users } from '../entities/user';
 import { UserOrError, UsersOrError } from '../@types/graphql';
 import { ErrorEvent as ErrorEventType } from '../../common/@types/error';
-import { MutableControllerImpl } from '../../common/controllers/mutableController';
+import { MutableControllerImpl } from '../../common/controllers/mutableControllerImpl';
 
 export class UserController extends MutableControllerImpl<UserType> {
 	repository: UserRepository;

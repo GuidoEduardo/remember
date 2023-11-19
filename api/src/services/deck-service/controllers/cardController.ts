@@ -1,6 +1,6 @@
 import { randomUUID } from 'crypto';
 import { ErrorEvent } from '../../common/@types/error';
-import { MutableControllerImpl } from '../../common/controllers/mutableController';
+import { MutableControllerImpl } from '../../common/controllers/mutableControllerImpl';
 import { CardCreate, CardOptional, Card as CardType } from '../@types/card';
 import { CardOrError, CardsOrError } from '../@types/graphql';
 import { CardRepository } from '../repositories/cardRepository';

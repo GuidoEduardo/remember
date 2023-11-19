@@ -1,5 +1,5 @@
 import { Controller } from './controller';
 
-export interface Mutator<T, E> {
-	setController(controller: Controller<T, E>): void;
+export interface Mutator<T> {
+	setController(controller: Controller<T>): void;
 }

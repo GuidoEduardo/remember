@@ -1,10 +1,10 @@
 import { randomUUID } from 'crypto';
-import { ErrorEvent } from '../../common/@types/error';
-import { MutableControllerImpl } from '../../common/controllers/mutableController';
+import { MutableControllerImpl } from '../../common/controllers/mutableControllerImpl';
 import { Deck as DeckType, DeckCreate, DeckOptional } from '../@types/deck';
 import { DeckOrError, DecksOrError } from '../@types/graphql';
 import { Deck, Decks } from '../entities/deck';
 import { DeckRepository } from '../repositories/deckRepository';
+import { ResultOrError } from '../../common/@types/graphql';
 
 export class DeckController extends MutableControllerImpl<DeckType> {
 	repository: DeckRepository;
@@ -70,9 +70,9 @@ export class DeckController extends MutableControllerImpl<DeckType> {
 	}
 
 	@DeckController.handleError
-	async delete(externalId: UUID): Promise<string | ErrorEvent> {
+	async delete(externalId: UUID): Promise<ResultOrError<string>> {
 		await this.repository.delete(externalId);
 
-		return 'Deck delete succesfully!';
+		return "Deck deleted succesfully";
 	}
 }

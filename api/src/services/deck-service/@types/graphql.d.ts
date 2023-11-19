@@ -1,19 +1,16 @@
-import { EntityOrError, EntitiesOrError } from '../../common/@types/graphql';
+import { ResultOrError, ResultsOrError } from '../../common/@types/graphql';
 import { Answer } from './answer';
-import { CardOnDeck } from './cardOnDeck';
+import { Card } from './card';
 import { Deck } from './deck';
 
-type DeckOrError = EntityOrError<Deck>;
-type DecksOrError = EntitiesOrError<Deck>;
+type DeckOrError = ResultOrError<Deck>;
+type DecksOrError = ResultsOrError<Deck>;
 
-type CardOrError = EntityOrError<Card>;
-type CardsOrError = EntitiesOrError<Cards>;
+type CardOrError = ResultOrError<Card>;
+type CardsOrError = ResultsOrError<Cards>;
 
-type AnswerOrError = EntityOrError<Answer>;
-type AnswersOrError = EntitiesOrError<Answer>;
-
-type CardOnDeckOrError = EntityOrError<CardOnDeck>;
-type CardsOnDecksOrError = EntitiesOrError<CardOnDeck>;
+type AnswerOrError = ResultOrError<Answer>;
+type AnswersOrError = ResultsOrError<Answer>;
 
 export {
 	DeckOrError,
@@ -22,6 +19,4 @@ export {
 	CardsOrError,
 	AnswerOrError,
 	AnswersOrError,
-	CardOnDeckOrError,
-	CardsOnDecksOrError,
 };

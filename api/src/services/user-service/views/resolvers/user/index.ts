@@ -1,21 +1,21 @@
 import { UserCreate, UserOptional } from '../../../@types/user';
 import { controllers } from '../../../controllers';
 import { UserMutator } from './mutation';
-import { UserQuery } from './query';
+import { UserSearcher } from './query';
 
-const userQuery = new UserQuery(controllers.userController);
+const userSearcher = new UserSearcher(controllers.userController);
 const userMutator = new UserMutator(controllers.userController);
 
 const userQueries = {
-	getUser: (_: unknown, request: { id: UUID }) => userQuery.getUser(request),
-	getUsers: (_: unknown) => userQuery.getUsers(),
-	findUsers: (_: unknown, request: { by: UserOptional }) => userQuery.findUsers(request),
+	getUser: (_: unknown, request: { id: UUID }) => userSearcher.get(request),
+	getUsers: (_: unknown) => userSearcher.getAll(),
+	findUsers: (_: unknown, request: { by: UserOptional }) => userSearcher.find(request),
 };
 
 const userMutations = {
-	createUser: (_: unknown, request: { data: UserCreate }) => userMutator.createUser(request),
-	updateUser: (_: unknown, request: { id: UUID; data: UserOptional }) => userMutator.updateUser(request),
-	deleteUser: (_: unknown, request: { id: UUID }) => userMutator.deleteUser(request),
+	createUser: (_: unknown, request: { data: UserCreate }) => userMutator.create(request),
+	updateUser: (_: unknown, request: { id: UUID; data: UserOptional }) => userMutator.update(request),
+	deleteUser: (_: unknown, request: { id: UUID }) => userMutator.delete(request),
 };
 
 export { userQueries, userMutations };

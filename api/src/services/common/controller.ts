@@ -1,17 +1,17 @@
-import { MutableRepository, Repository } from './repository';
+import { ResultOrError, ResultsOrError } from "./@types/graphql";
 
-export interface Controller<T, E> {
-	create(data: object): Promise<object | E>;
+export interface Controller<T> {
+	create(data: object): Promise<ResultOrError<T>>;
 
-	get(externalId: UUID): Promise<object | E>;
+	get(externalId: UUID): Promise<ResultOrError<T>>;
 
-	getAll(): Promise<object | E>;
+	getAll(): Promise<ResultsOrError<T>>;
 
-	find(filter: object): Promise<object | E>;
+	find(filter: object): Promise<ResultsOrError<T>>;
 }
 
-export interface MutableController<T, E> extends Controller<T, E> {
-	update(externalId: UUID, data: object): Promise<object | E>;
+export interface MutableController<T> extends Controller<T> {
+	update(externalId: UUID, data: object): Promise<ResultOrError<T>>;
 
-	delete(externalId: UUID): Promise<string | E>;
+	delete(externalId: UUID): Promise<ResultOrError<string>>;
 }

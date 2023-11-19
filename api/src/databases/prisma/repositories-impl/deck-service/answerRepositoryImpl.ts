@@ -36,6 +36,7 @@ export class AnswerRepositoryImpl extends RepositoryImpl<Answer> implements Answ
 						externalId: data.externalId,
 						answeredById: user.id,
 						difficulty: data.difficulty,
+						answeredAt: data.answeredAt,
 						answerAgainAt: data.answerAgainAt,
 					},
 				},

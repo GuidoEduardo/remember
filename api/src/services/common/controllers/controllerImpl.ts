@@ -1,29 +1,25 @@
-import { ErrorEvent as ErrorEventType } from '../@types/error';
 import { ErrorEvent } from '../entities/error';
-import { MutableController } from '../controller';
-import { MutableRepository } from '../repository';
+import { Controller } from '../controller';
+import { Repository } from '../repository';
 import { InvalidFieldError, NotFoundError, UniqueFieldError, UnknownError } from '../exceptions';
 import { ZodError } from 'zod';
+import { ResultOrError, ResultsOrError } from '../@types/graphql';
 
-export abstract class MutableControllerImpl<T> implements MutableController<T, ErrorEventType> {
-	abstract repository: MutableRepository<T>;
+export abstract class ControllerImpl<T> implements Controller<T> {
+	abstract repository: Repository<T>;
 
-	abstract create(data: object): Promise<object | ErrorEventType>;
+	abstract create(data: object): Promise<ResultOrError<T>>;
 
-	abstract get(externalId: UUID): Promise<object | ErrorEventType>;
+	abstract get(externalId: UUID): Promise<ResultOrError<T>>;
 
-	abstract getAll(): Promise<object | ErrorEventType>;
+	abstract getAll(): Promise<ResultsOrError<T>>;
 
-	abstract find(filter: object): Promise<object | ErrorEventType>;
-
-	abstract update(externalId: UUID, data: object): Promise<object | ErrorEventType>;
-
-	abstract delete(externalId: UUID): Promise<string | ErrorEventType>;
+	abstract find(filter: object): Promise<ResultsOrError<T>>;
 
 	static handleError(target: any, propertyKey: string, descriptor: PropertyDescriptor) {
 		const originalMethod = descriptor.value;
 
-		descriptor.value = async function (this: any, ...args: any[]) {
+		descriptor.value = async function (...args: any[]) {
 			try {
 				return await originalMethod.apply(this, args);
 			} catch (err) {

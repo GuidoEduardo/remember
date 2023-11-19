@@ -47,6 +47,13 @@ model Card {
     // @@index([contentFront(ops: raw("gin_trgm_ops")), contentBack(ops: raw("gin_trgm_ops"))], type: Gin)
 }
 
+enum DifficultyLevel {
+    Retry
+    Hard
+    Good
+    Easy
+}
+
 model Answer {
     id            BigInt       @id @default(autoincrement())
     externalId    String       @db.Uuid @unique
@@ -54,7 +61,7 @@ model Answer {
     cardId        BigInt
     answeredBy    User         @relation(fields: [answeredById], references: [id], onDelete: Cascade)
     answeredById  BigInt
-    difficulty    String
-    answeredAt    DateTime     @default(now())
+    difficulty    DifficultyLevel
+    answeredAt    DateTime
     answerAgainAt DateTime
 }

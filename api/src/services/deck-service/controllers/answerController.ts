@@ -1,9 +1,10 @@
-import { Answer, Answers } from '../entities/answer';
-import { Answer as AnswerType } from '../@types/answer';
-import { ControllerImpl } from '../../common/controllers/controller';
+import { Answer, Answers, DifficultyTimeInSeconds } from '../entities/answer';
+import { AnswerCreate, AnswerOptional, Answer as AnswerType } from '../@types/answer';
+import { ControllerImpl } from '../../common/controllers/controllerImpl';
 import { AnswerRepository } from '../repositories/answerRepository';
 import { AnswerOrError, AnswersOrError } from '../@types/graphql';
 import { randomUUID } from 'crypto';
+import { DifficultyLevel } from '@prisma/client';
 
 export class AnswerController extends ControllerImpl<AnswerType> {
 	repository: AnswerRepository;
@@ -14,9 +15,13 @@ export class AnswerController extends ControllerImpl<AnswerType> {
 	}
 
 	@AnswerController.handleError
-	async create(data: object): Promise<AnswerOrError> {
+	async create(data: AnswerCreate): Promise<AnswerOrError> {
+		const { answeredAt, answerAgainAt } = this.calculateDifficultyTime(data.difficulty);
+
 		const requestAnswer = Answer.parse({
 			externalId: randomUUID(),
+			answeredAt,
+			answerAgainAt,
 			...data,
 		});
 
@@ -29,7 +34,7 @@ export class AnswerController extends ControllerImpl<AnswerType> {
 	}
 
 	@AnswerController.handleError
-	async get(externalId: string): Promise<AnswerOrError> {
+	async get(externalId: UUID): Promise<AnswerOrError> {
 		const answer = Answer.parse(await this.repository.get(externalId));
 
 		return {
@@ -49,12 +54,22 @@ export class AnswerController extends ControllerImpl<AnswerType> {
 	}
 
 	@AnswerController.handleError
-	async find(filter: object): Promise<AnswersOrError> {
+	async find(filter: AnswerOptional): Promise<AnswersOrError> {
 		const answers = Answers.parse(await this.repository.find(filter));
 
 		return {
 			__typename: 'Answers',
 			objects: answers,
 		};
+	}
+
+	calculateDifficultyTime(difficulty: DifficultyLevel): { answeredAt: Date, answerAgainAt: Date } {
+		const answeredAt = new Date();
+		const answerAgainAt = new Date(answeredAt.getTime() + DifficultyTimeInSeconds[difficulty]);
+
+		return {
+			answeredAt,
+			answerAgainAt
+		}
 	}
 }

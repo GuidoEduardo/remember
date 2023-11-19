@@ -15,6 +15,14 @@ export const cardSchema = gql`
 		objects: [Card]
 	}
 
+	type CardWithoutAnswers {
+		externalId:   ID!
+		contentFront: String!
+		contentBack:  String!
+		createdAt: 	  DateTimeISO!
+		updatedAt: 	  DateTimeISO!
+	}
+
 	input CardCreate {
 		deckId:		  ID!
 		contentFront: String!

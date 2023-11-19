@@ -5,7 +5,7 @@ export const deckSchema = gql`
 		externalId: ID!
 		ownerId:    ID
 		title:      String!
-		cards:      [Card]
+		cards:      [CardWithoutAnswers]
 		createdAt:  DateTimeISO!
 		updatedAt:  DateTimeISO!
 	}
@@ -15,6 +15,7 @@ export const deckSchema = gql`
 	}
 
 	input DeckCreate {
+		ownerId: ID!
 		title: String!
 	}
 

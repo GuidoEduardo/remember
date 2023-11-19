@@ -3,7 +3,7 @@ import { UserServiceTypeDefs } from './schemas';
 import { DateTimeISOResolver } from 'graphql-scalars';
 import { userQueries, userMutations } from './resolvers/user';
 
-const userServiceResolver: GraphQlResolver = {
+const UserServiceResolver: GraphQlResolver = {
 	DateTimeISO: DateTimeISOResolver,
 
 	Query: {
@@ -14,4 +14,4 @@ const userServiceResolver: GraphQlResolver = {
 	},
 };
 
-export { userServiceResolver, UserServiceTypeDefs };
+export { UserServiceResolver, UserServiceTypeDefs };

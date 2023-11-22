@@ -1,5 +1,6 @@
 {
 	"compilerOptions": {
+		"types": ["bun-types"],
 		"lib": ["ESNext"],
 		"module": "esnext",
 		"target": "esnext",
@@ -17,8 +18,11 @@
 		"strictPropertyInitialization": false,
 		"experimentalDecorators": true,
 		"allowJs": true,
-		"outDir": "dist"
+		"esModuleInterop": true,
+		"rootDir": "src",
+		"outDir": "dist",
+
 	},
-	"include": ["src"],
+	"include": ["src/**/*"],
 	"exclude": ["node_modules"]
 }

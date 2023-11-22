@@ -1,46 +1,47 @@
 {
-	"name": "@remember/api",
-	"module": "src/app.ts",
-	"main": "dist/app.js",
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "tsc dist",
-		"dev": "NODE_ENV=development tsx watch --clear-screen=false src/app.ts",
-		"prisma:generate": " bun prisma generate --schema=./src/databases/prisma/schema.prisma",
+  "name": "@remember/api",
+  "module": "src/app.ts",
+  "main": "dist/app.js",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "bun run generate && bun build --target=bun ./src/app.ts --outdir=dist && bun ./dist/app.js",
+    "dev": "bun ./src/app.ts",
+		"clean": "rm -rf dist",
+    "generate": "bun run generate:prisma",
+    "generate:prisma": "prisma generate --schema=./src/databases/prisma/schema.prisma",
 		"prisma:migrate-dev": "bun prisma migrate dev --name init --schema=./src/databases/prisma/schema.prisma"
-	},
-	"repository": {
-		"type": "git",
-		"url": "https://github.com/GuidoEduardo/remember.git",
-		"directory": "api"
-	},
-	"license": "MIT",
-	"devDependencies": {
-		"@anatine/zod-mock": "^3.13.3",
-		"@faker-js/faker": "^8.3.1",
-		"@graphql-tools/schema": "^10.0.0",
-		"@prisma/client": "^5.6.0",
-		"@types/node": "^20.9.0",
-		"@types/uuid": "^9.0.7",
-		"@types/validator": "^13.11.6",
-		"bun-types": "latest",
-		"graphql-tag": "^2.12.6"
-	},
-	"peerDependencies": {
-		"typescript": "^5.0.0"
-	},
-	"type": "module",
-	"dependencies": {
-		"@envelop/core": "^5.0.0",
-		"@envelop/extended-validation": "^4.0.0",
-		"graphql": "^16.8.1",
-		"graphql-scalars": "^1.22.4",
-		"graphql-yoga": "^5.0.0",
-		"prisma": "^5.6.0",
-		"uuid": "^9.0.1",
-		"validator": "^13.11.0",
-		"zod": "^3.22.4"
-	}
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/GuidoEduardo/remember.git",
+    "directory": "api"
+  },
+  "license": "MIT",
+  "devDependencies": {
+    "@anatine/zod-mock": "^3.13.3",
+    "@faker-js/faker": "^8.3.1",
+    "@graphql-tools/schema": "^10.0.0",
+    "@types/uuid": "^9.0.7",
+    "@types/validator": "^13.11.6",
+    "bun-types": "^1.0.13",
+    "graphql-tag": "^2.12.6"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "type": "module",
+  "dependencies": {
+    "@envelop/core": "^5.0.0",
+    "@envelop/extended-validation": "^4.0.0",
+    "@prisma/client": "^5.6.0",
+    "graphql": "^16.8.1",
+    "graphql-scalars": "^1.22.4",
+    "graphql-yoga": "^5.0.0",
+    "prisma": "^5.6.0",
+    "uuid": "^9.0.1",
+    "validator": "^13.11.0",
+    "zod": "^3.22.4"
+  }
 }

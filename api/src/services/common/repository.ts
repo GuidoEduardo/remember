@@ -10,7 +10,7 @@ interface Repository<T> {
 
 	getAll(options: Request): Promise<GenericResults<T>>;
 
-	find(options: Request, filter: object): Promise<GenericResults<T>>;
+	find( options: Request, filter: object): Promise<GenericResults<T>>;
 }
 
 interface MutableRepository<T> extends Repository<T> {

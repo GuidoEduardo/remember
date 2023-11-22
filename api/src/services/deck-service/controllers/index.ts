@@ -1,4 +1,4 @@
-import { repositories } from '../../../databases/prisma/prismaService';
+import { repositories } from '../../../databases/prisma/repositories';
 import { AnswerController } from './answerController';
 import { CardController } from './cardController';
 import { DeckController } from './deckController';

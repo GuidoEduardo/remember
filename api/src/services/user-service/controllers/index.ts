@@ -1,4 +1,4 @@
-import { repositories } from '../../../databases/prisma/prismaService';
+import { repositories } from '../../../databases/prisma/repositories';
 import { UserController } from './userController';
 
 export const controllers = {

@@ -1,7 +1,9 @@
 {
-  "name": "remember",
+  "name": "remember-monorepo",
+	"private": true,
   "scripts": {
-    "format": "prettier --cache --check .",
+		"build": "bun ",
+    "format": "prettier --cache --creck .",
     "lint": "eslint --cache ."
   },
   "devDependencies": {

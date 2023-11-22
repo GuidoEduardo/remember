@@ -1,12 +1,9 @@
-import { createServer } from 'http';
-import { yogaServer } from './config/yoga';
+import { yoga } from './config/yoga';
 
 async function main() {
-	const server = createServer(yogaServer);
+	const server = Bun.serve(yoga);
 
-	server.listen(5000, () => {
-		console.info(`🚀 server ready at: http://localhost:5000\n💫 launched`);
-	});
+	console.log(`🚀 server running on ${new URL(yoga.graphqlEndpoint, `http://${server.hostname}:${server.port}`)}\n💫 launched`);
 }
 
 main().catch(console.error);

@@ -21,8 +21,14 @@ const schema = makeExecutableSchema({
 	typeDefs,
 });
 
-const yogaServer = createYoga({
-	schema,
+const yoga = createYoga({
+	graphqlEndpoint: '/',
+	context: (req) => {
+		return {
+			req
+		}
+	},
+	schema
 });
 
-export { yogaServer };
+export { yoga };

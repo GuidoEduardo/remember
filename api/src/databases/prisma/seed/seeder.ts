@@ -1,4 +1,5 @@
-import { DifficultyLevel, Prisma, PrismaClient } from '@prisma/client';
+import { DifficultyLevel } from '@prisma/client';
+import { PrismaClient } from '../prisma';
 import { Repository } from '../../../services/common/repository';
 import { Controller } from '../../../services/common/controller';
 import { UserCreate, Users } from '../../../services/user-service/@types/user';
